@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
 </head>
 <body>
-    <h1>{{.Title}}</h1>
-    <h2>By {{ .Author}}</h2>
-    <p>{{.Description}}</p>
+    {{template "sidebar" .}}
+    <h1>{{.User.Title}}</h1>
+    <h2>By {{ .User.Name}}</h2>
+    <p>{{.User.Description}}</p>
     {{template "footer" .}}
 </body>

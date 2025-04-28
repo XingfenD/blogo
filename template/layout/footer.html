@@ -1,11 +1,14 @@
 {{define "footer"}}
-<footer>
-    <div>
-        Copyright © {{date "2006"}}&nbsp;
-        <i style="color: red" class="iconfont icon-xiai"></i>&nbsp; {{.Title}}
-    </div>
-    <div>
-        Golang
-    </div>
+<footer class="site-footer">
+    <section class="copyright">
+        Copyright &copy; {{date "2006"}}&nbsp;
+        <i style="color: red" class="iconfont icon-xiai"></i>&nbsp; {{.User.Title}}
+    </section>
+    <section class="powerby">
+        {{.Footer.CustomText}}
+        <br/>
+        Powered by&nbsp;
+        <a href="https://golang.google.cn">Golang</a>
+    </section>
 </footer>
 {{ end }}

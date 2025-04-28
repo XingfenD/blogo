@@ -11,7 +11,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/XingfenD/blogo/modules/config"
+	"github.com/XingfenD/blogo/module/config"
 )
 
 // StartServer 初始化并启动 HTTP 服务器
@@ -59,21 +59,17 @@ func loadRouter(loaded_config config.Config) {
 			log.Println(err)
 			return
 		}
-		t, err = t.ParseFiles(path+"/template/index.html", path+"/template/layout/footer.html")
+		t, err = t.ParseFiles(
+			path+"/template/index.html",
+			path+"/template/layout/footer.html",
+			path+"/template/layout/sidebar.html",
+		)
 		if err != nil {
 			http.Error(w, "Failed to parse template", http.StatusInternalServerError)
 			log.Println(err)
 			return
 		}
-		err = t.Execute(w, struct {
-			Title       string
-			Description string
-			Author      string
-		}{
-			Title:       loaded_config.User.Title,
-			Description: loaded_config.User.Greeting,
-			Author:      loaded_config.User.Name,
-		})
+		err = t.Execute(w, loaded_config)
 		if err != nil {
 			http.Error(w, "Failed to execute template", http.StatusInternalServerError)
 			log.Println(err)

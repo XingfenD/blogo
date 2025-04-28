@@ -13,6 +13,19 @@ type Config struct {
 		Title       string `toml:"title"`
 		Greeting    string `toml:"greeting"`
 		Description string `toml:"description"`
+		HomeUrl     string `toml:"home_url"`
+		AvatarUrl   string `toml:"avatar_url"`
+	}
+	Sidebar struct {
+		Emoji       string `toml:"emoji"`
+		SocialLinks []struct {
+			Name string `toml:"name"`
+			Url  string `toml:"url"`
+			Icon string `toml:"icon"`
+		} `toml:"social_links"`
+	}
+	Footer struct {
+		CustomText string `toml:"custom_text"`
 	}
 }
 

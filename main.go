@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/XingfenD/blogo/modules/config"
-	"github.com/XingfenD/blogo/modules/router"
+	"github.com/XingfenD/blogo/module/config"
+	"github.com/XingfenD/blogo/module/router"
 )
 
 func main() {
