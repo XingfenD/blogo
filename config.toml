@@ -1,1 +1,6 @@
 port2listen=8080
+[user]
+title='Blogo'
+description='blogo, a simple blog engine by go'
+greeting='Hello world from blogo'
+name='Fendy'

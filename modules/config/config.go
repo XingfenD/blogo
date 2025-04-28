@@ -8,6 +8,12 @@ import (
 
 type Config struct {
 	Port2listen int `toml:"port2listen"`
+	User        struct {
+		Name        string `toml:"name"`
+		Title       string `toml:"title"`
+		Greeting    string `toml:"greeting"`
+		Description string `toml:"description"`
+	}
 }
 
 func LoadConfig() Config {

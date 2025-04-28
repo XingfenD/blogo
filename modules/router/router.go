@@ -2,7 +2,6 @@ package router
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"net/http"
 	"os"
@@ -46,22 +45,7 @@ func StartServer(loaded_config config.Config) {
 }
 
 func loadRouter(loaded_config config.Config) {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		jsonStr, _ := json.Marshal(
-			struct {
-				Title       string
-				Description string
-				Author      string
-			}{
-				Title:       "Blogo",
-				Description: "A simple blog engine",
-				Author:      "Fendy",
-			})
-		w.Write(jsonStr)
-	})
-
-	http.HandleFunc("/index.html", func(w http.ResponseWriter, r *http.Request) {
+	indexHTML := func(w http.ResponseWriter, r *http.Request) {
 		funcMap := template.FuncMap{
 			"date": func(format string) string {
 				return time.Now().Format(format)
@@ -86,13 +70,15 @@ func loadRouter(loaded_config config.Config) {
 			Description string
 			Author      string
 		}{
-			Title:       "Blogo",
-			Description: "A simple blog engine by ",
-			Author:      "Fendy",
+			Title:       loaded_config.User.Title,
+			Description: loaded_config.User.Greeting,
+			Author:      loaded_config.User.Name,
 		})
 		if err != nil {
 			http.Error(w, "Failed to execute template", http.StatusInternalServerError)
 			log.Println(err)
 		}
-	})
+	}
+	http.HandleFunc("/", indexHTML)
+	http.HandleFunc("/index.html", indexHTML)
 }
