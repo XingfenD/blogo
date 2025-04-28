@@ -1,0 +1,10 @@
+temp/
+
+tmp/
+
+ref/
+
+build/
+
+.DS_Store
+
