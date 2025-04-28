@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/XingfenD/blogo/module/config"
+	"github.com/XingfenD/blogo/module/loader"
 )
 
 // StartServer 初始化并启动 HTTP 服务器
@@ -19,7 +20,7 @@ func StartServer(loaded_config config.Config) {
 	loadRouter(loaded_config)
 
 	server := &http.Server{
-		Addr: "localhost:" + strconv.Itoa(loaded_config.Port2listen),
+		Addr: "localhost:" + strconv.Itoa(loaded_config.Basic.Port2listen),
 	}
 
 	go func() {
@@ -45,6 +46,7 @@ func StartServer(loaded_config config.Config) {
 }
 
 func loadRouter(loaded_config config.Config) {
+	icon_map, _ := loader.LoadIcons()
 	indexHTML := func(w http.ResponseWriter, r *http.Request) {
 		funcMap := template.FuncMap{
 			"date": func(format string) string {
@@ -69,7 +71,13 @@ func loadRouter(loaded_config config.Config) {
 			log.Println(err)
 			return
 		}
-		err = t.Execute(w, loaded_config)
+		err = t.Execute(w, struct {
+			Config config.Config
+			Icons  map[string]string
+		}{
+			Config: loaded_config,
+			Icons:  icon_map,
+		})
 		if err != nil {
 			http.Error(w, "Failed to execute template", http.StatusInternalServerError)
 			log.Println(err)

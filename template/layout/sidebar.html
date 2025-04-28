@@ -7,19 +7,32 @@
     </button>
     <header>
         <figure class="site-avatar">
-            <a href="{{.User.HomeUrl}}">
-                <img src="{{.User.AvatarUrl}}" alt="{{.User.Name}}">
+            <a href="{{.Config.User.HomeUrl}}">
+                <img src="{{.Config.User.AvatarUrl}}" alt="{{.Config.User.Name}}">
             </a>
-            <span class="emoji">{{.Sidebar.Emoji}}</span>
+            <span class="emoji">{{.Config.Sidebar.Emoji}}</span>
         </figure>
     </header>
     <ol class="menu-social">
-        {{range .Sidebar.SocialLinks}}
+        {{range .Config.Sidebar.SocialLinks}}
         <li>
             <a href="{{.Url}}" target="_blank" title="{{.Name}}" rel="me">
+                {{index $.Icons .Icon}}
             </a>
         </li>
         {{end}}
     </ol>
+    <ol class="menu" id="main-menu">
+        <li class="menu-item">
+            <a href="{{.Config.Basic.BaseUrl}}">
+                {{index .Icons .Config.Sidebar.HomeIcon}}
+            </a>
+            <a>
+                <!-- {{index $.Icons.Icon}} -->
+                <span>{{.Name}}</span>
+            </a>
+        </li>
+    </ol>
+
 </aside>
 {{end}}

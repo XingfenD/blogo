@@ -5,8 +5,8 @@
 </head>
 <body>
     {{template "sidebar" .}}
-    <h1>{{.User.Title}}</h1>
-    <h2>By {{ .User.Name}}</h2>
-    <p>{{.User.Description}}</p>
+    <h1>{{.Config.User.Title}}</h1>
+    <h2>By {{.Config.User.Name}}</h2>
+    <p>{{.Config.User.Description}}</p>
     {{template "footer" .}}
 </body>

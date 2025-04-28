@@ -1,50 +1,54 @@
 package config
 
 import (
-	"log"
+    "log"
 
-	"github.com/BurntSushi/toml"
+    "github.com/BurntSushi/toml"
 )
 
 type Config struct {
-	Port2listen int `toml:"port2listen"`
-	User        struct {
-		Name        string `toml:"name"`
-		Title       string `toml:"title"`
-		Greeting    string `toml:"greeting"`
-		Description string `toml:"description"`
-		HomeUrl     string `toml:"home_url"`
-		AvatarUrl   string `toml:"avatar_url"`
-	}
-	Sidebar struct {
-		Emoji       string `toml:"emoji"`
-		SocialLinks []struct {
-			Name string `toml:"name"`
-			Url  string `toml:"url"`
-			Icon string `toml:"icon"`
-		} `toml:"social_links"`
-	}
-	Footer struct {
-		CustomText string `toml:"custom_text"`
-	}
+    Basic struct {
+        Port2listen int `toml:"port2listen"`
+        BaseUrl     string `toml:"base_url"`
+    }
+    User        struct {
+        Name        string `toml:"name"`
+        Title       string `toml:"title"`
+        Greeting    string `toml:"greeting"`
+        Description string `toml:"description"`
+        HomeUrl     string `toml:"home_url"`
+        AvatarUrl   string `toml:"avatar_url"`
+    }
+    Sidebar struct {
+        Emoji       string `toml:"emoji"`
+        HomeIcon    string `toml:"home_icon"`
+        SocialLinks []struct {
+            Name string `toml:"name"`
+            Url  string `toml:"url"`
+            Icon string `toml:"icon"`
+        } `toml:"social_links"`
+    }
+    Footer struct {
+        CustomText string `toml:"custom_text"`
+    }
 }
 
 func LoadConfig() Config {
-	var config Config
-	_, err := toml.DecodeFile("config.toml", &config)
-	if err != nil {
-		log.Fatalf("Error loading config: %v", err)
-	}
-	log.Printf("Config loaded: %+v", config)
+    var config Config
+    _, err := toml.DecodeFile("config.toml", &config)
+    if err != nil {
+        log.Fatalf("Error loading config: %v", err)
+    }
+    log.Printf("Config loaded: %+v", config)
 
-	if !checkConfig() {
-		log.Fatalf("Config check failed")
-	}
+    if !checkConfig() {
+        log.Fatalf("Config check failed")
+    }
 
-	return config
+    return config
 }
 
 func checkConfig() bool {
 
-	return true
+    return true
 }
