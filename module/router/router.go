@@ -47,6 +47,7 @@ func StartServer(loaded_config config.Config) {
 
 func loadRouter(loaded_config config.Config) {
 	icon_map, _ := loader.LoadIcons()
+	loader.LoadPages()
 	indexHTML := func(w http.ResponseWriter, r *http.Request) {
 		funcMap := template.FuncMap{
 			"date": func(format string) string {
@@ -83,6 +84,7 @@ func loadRouter(loaded_config config.Config) {
 			log.Println(err)
 		}
 	}
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	http.HandleFunc("/", indexHTML)
 	http.HandleFunc("/index.html", indexHTML)
 }

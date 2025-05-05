@@ -12,6 +12,14 @@
             </a>
             <span class="emoji">{{.Config.Sidebar.Emoji}}</span>
         </figure>
+        <div class=""site-meta>
+            <h1 class="site-name">
+                <a href="{{.Config.User.HomeUrl}}">
+                    {{.Config.User.Name}}
+                </a>
+            </h1>
+            <h2 class="site-description">{{.Config.User.Description}}</h2>
+        </div>
     </header>
     <ol class="menu-social">
         {{range .Config.Sidebar.SocialLinks}}
@@ -28,8 +36,6 @@
                 {{index .Icons .Config.Sidebar.HomeIcon}}
             </a>
             <a>
-                <!-- {{index $.Icons.Icon}} -->
-                <span>{{.Name}}</span>
             </a>
         </li>
     </ol>

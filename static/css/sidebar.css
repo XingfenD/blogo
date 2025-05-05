@@ -1,0 +1,162 @@
+/* 侧边栏整体样式 */
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    background-color: #f8f9fa;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 汉堡菜单按钮样式 */
+.hamburger {
+    padding: 15px 15px;
+    display: inline-block;
+    cursor: pointer;
+    transition-property: opacity, filter;
+    transition-duration: 0.15s;
+    transition-timing-function: linear;
+    font: inherit;
+    color: inherit;
+    text-transform: none;
+    background-color: transparent;
+    border: 0;
+    margin: 0;
+    overflow: visible;
+}
+
+.hamburger-box {
+    width: 40px;
+    height: 24px;
+    display: inline-block;
+    position: relative;
+}
+
+.hamburger-inner {
+    display: block;
+    top: 50%;
+    margin-top: -2px;
+}
+
+.hamburger-inner,
+.hamburger-inner::before,
+.hamburger-inner::after {
+    width: 40px;
+    height: 4px;
+    background-color: #000;
+    border-radius: 4px;
+    position: absolute;
+    transition-property: transform;
+    transition-duration: 0.15s;
+    transition-timing-function: ease;
+}
+
+.hamburger-inner::before,
+.hamburger-inner::after {
+    content: "";
+    display: block;
+}
+
+.hamburger-inner::before {
+    top: -10px;
+}
+
+.hamburger-inner::after {
+    bottom: -10px;
+}
+
+/* 头像容器样式 */
+.site-avatar {
+    position: relative;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* 头像图片样式 */
+.site-avatar img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* emoji 样式，使其位于头像右下角，并设置为圆形 */
+.emoji {
+    position: absolute;
+    right: 30px;
+    bottom: 10px;
+    background-color: white;
+    /* 通过设置相同的宽高和 50% 的圆角实现圆形 */
+    width: 24px;
+    height: 24px;
+    /* 确保文字垂直居中 */
+    line-height: 24px;
+    border-radius: 50%;
+    padding: 0;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    /* 确保文字水平居中 */
+    text-align: center;
+    /* 适当调整字体大小，避免内容过大影响居中 */
+    font-size: 16px;
+}
+
+/* 网站元信息样式 */
+.site-meta {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.site-name {
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* 去除 site-name 链接下划线 */
+.site-name a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.site-description {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+}
+
+/* 社交链接列表样式 */
+.menu-social {
+    list-style-type: none;
+    padding: 0;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.menu-social li {
+    display: inline-block;
+    margin: 0 10px;
+}
+
+.menu-social li a {
+    font-size: 24px;
+    color: #007bff;
+    text-decoration: none;
+}
+
+/* 主菜单样式 */
+.menu {
+    list-style-type: none;
+    padding: 0;
+}
+
+.menu-item a {
+    display: block;
+    padding: 10px;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.menu-item a:hover {
+    background-color: #e9ecef;
+}
