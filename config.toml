@@ -1,6 +1,7 @@
 [basic]
 port2listen = 8080
 base_url = 'localhost:8080'
+log_level = 4
 
 [user]
 title = 'Blogo'

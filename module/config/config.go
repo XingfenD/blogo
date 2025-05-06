@@ -9,7 +9,7 @@ import (
 type Config struct {
 	Basic struct {
 		BaseUrl     string `toml:"base_url"`
-		LogLevel    string `toml:"log_level"`
+		LogLevel    int    `toml:"log_level"`
 		Port2listen int    `toml:"port2listen"`
 	}
 	User struct {
@@ -43,7 +43,7 @@ func LoadConfig() Config {
 	log.Printf("Config loaded: %+v", config)
 
 	if !checkConfig() {
-		log.Fatalf("Config check failed")
+		log.Fatal("Config check failed")
 	}
 
 	return config

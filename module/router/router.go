@@ -2,7 +2,6 @@ package router
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -24,9 +23,9 @@ func StartServer(loaded_config config.Config) {
 	}
 
 	go func() {
-		log.Printf("Starting server on %s", server.Addr)
+		loader.Logger.Infof("Starting server on http://%s/", server.Addr)
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Could not start server: %v", err)
+			loader.Logger.Errorf("Could not start server: %v", err)
 		}
 	}()
 
@@ -34,15 +33,15 @@ func StartServer(loaded_config config.Config) {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	log.Println("Shutting down server...")
+	loader.Logger.Info("Shutting down server...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	if err := server.Shutdown(ctx); err != nil {
-		log.Fatal("Server forced to shutdown:", err)
+		loader.Logger.Error("Server forced to shutdown:", err)
 	}
 
-	log.Println("Server exiting")
+	loader.Logger.Info("Server exiting")
 }
 
 func loadRouter(loaded_config config.Config) {
@@ -59,7 +58,7 @@ func loadRouter(loaded_config config.Config) {
 		path, err := os.Getwd()
 		if err != nil {
 			http.Error(w, "Failed to get working directory", http.StatusInternalServerError)
-			log.Println(err)
+			loader.Logger.Error(err)
 			return
 		}
 		t, err = t.ParseFiles(
@@ -69,7 +68,7 @@ func loadRouter(loaded_config config.Config) {
 		)
 		if err != nil {
 			http.Error(w, "Failed to parse template", http.StatusInternalServerError)
-			log.Println(err)
+			loader.Logger.Error(err)
 			return
 		}
 		err = t.Execute(w, struct {
@@ -81,7 +80,7 @@ func loadRouter(loaded_config config.Config) {
 		})
 		if err != nil {
 			http.Error(w, "Failed to execute template", http.StatusInternalServerError)
-			log.Println(err)
+			loader.Logger.Error(err)
 		}
 	}
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))

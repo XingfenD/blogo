@@ -1,13 +1,24 @@
 package loader
 
 import (
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/BurntSushi/toml"
+	"github.com/sirupsen/logrus"
 )
+
+var Logger logrus.Logger
+
+func LoadLogger(logLevel int) {
+	Logger.Out = os.Stdout
+	Logger.Level = logrus.Level(logLevel)
+	Logger.Formatter = &logrus.TextFormatter{
+		ForceColors: true,
+	}
+	Logger.Info("Logger initialized")
+}
 
 func LoadIcons() (map[string]string, error) {
 	icons := make(map[string]string)
@@ -50,7 +61,7 @@ func LoadPages() map[string]FrontMatter {
 	ret := make(map[string]FrontMatter)
 	entries, err := os.ReadDir("content/page")
 	if err != nil {
-		log.Println("Error reading directory: ", err)
+		Logger.Info("Error reading directory: ", err)
 		return nil
 	}
 	for _, entry := range entries {
@@ -60,20 +71,20 @@ func LoadPages() map[string]FrontMatter {
 		indexMd := "content/page/" + entry.Name() + "/_index.md"
 		pf, err := os.ReadFile(indexMd)
 		if err != nil {
-			log.Println(err)
+			Logger.Error("Error reading file: ", err)
 			continue
 		}
 		content := string(pf)
 		tomlContent := extractFrontMatter(content)
 		if tomlContent == "" {
-			log.Println("No front matter found in the file: " + indexMd)
+			Logger.Warn("No front matter found in the file: " + indexMd)
 			continue
 		}
 
 		var frontMatter FrontMatter
 		_, err = toml.Decode(tomlContent, &frontMatter)
 		if err != nil {
-			log.Println("Error parsing TOML: ", err)
+			Logger.Error("Error parsing TOML: ", err)
 			return nil
 		}
 		ret[entry.Name()] = frontMatter
