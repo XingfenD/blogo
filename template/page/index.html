@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/sidebar.css">
 </head>
 <body>
     {{template "sidebar" .}}
-    <h1>{{.Config.User.Title}}</h1>
-    <h2>By {{.Config.User.Name}}</h2>
-    <p>{{.Config.User.Description}}</p>
+    <main class="main full-width">
+    <h1>HomePage</h1>
     {{template "footer" .}}
+    </main>
 </body>

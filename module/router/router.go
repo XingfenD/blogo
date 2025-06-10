@@ -46,8 +46,30 @@ func StartServer(loaded_config config.Config) {
 
 func loadRouter(loaded_config config.Config) {
 	icon_map, _ := loader.LoadIcons()
-	loader.LoadPages()
-	indexHTML := func(w http.ResponseWriter, r *http.Request) {
+	/* the static files */
+	http.Handle("/static/", http.StripPrefix("/static/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		loader.Logger.Infof("Request for %s from %s", r.URL.Path, r.RemoteAddr)
+		fs := http.Dir("static")
+		path := r.URL.Path
+
+		file, err := fs.Open(path)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		defer file.Close()
+
+		if info, _ := file.Stat(); info.IsDir() {
+			http.NotFound(w, r)
+			return
+		}
+
+		http.FileServer(fs).ServeHTTP(w, r)
+	})))
+	/* the main page */
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		var err error
+		loader.Logger.Infof("Request for / from %s", r.RemoteAddr)
 		funcMap := template.FuncMap{
 			"date": func(format string) string {
 				return time.Now().Format(format)
@@ -55,22 +77,18 @@ func loadRouter(loaded_config config.Config) {
 		}
 
 		t := template.New("index.html").Funcs(funcMap)
-		path, err := os.Getwd()
-		if err != nil {
-			http.Error(w, "Failed to get working directory", http.StatusInternalServerError)
-			loader.Logger.Error(err)
-			return
-		}
+
 		t, err = t.ParseFiles(
-			path+"/template/index.html",
-			path+"/template/layout/footer.html",
-			path+"/template/layout/sidebar.html",
+			loaded_config.Basic.RootPath+"/template/page/index.html",
+			loaded_config.Basic.RootPath+"/template/layout/footer.html",
+			loaded_config.Basic.RootPath+"/template/layout/sidebar.html",
 		)
 		if err != nil {
 			http.Error(w, "Failed to parse template", http.StatusInternalServerError)
 			loader.Logger.Error(err)
 			return
 		}
+		loader.Logger.Info("Loading template successfully")
 		err = t.Execute(w, struct {
 			Config config.Config
 			Icons  map[string]string
@@ -82,8 +100,11 @@ func loadRouter(loaded_config config.Config) {
 			http.Error(w, "Failed to execute template", http.StatusInternalServerError)
 			loader.Logger.Error(err)
 		}
-	}
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	http.HandleFunc("/", indexHTML)
-	http.HandleFunc("/index.html", indexHTML)
+	})
+	http.HandleFunc("/category/", func(w http.ResponseWriter, r *http.Request) {
+		loader.Logger.Infof("Request for /category/ from %s", r.RemoteAddr)
+	})
+	http.HandleFunc("/about/", func(w http.ResponseWriter, r *http.Request) {
+		loader.Logger.Infof("Request for /about/ from %s", r.RemoteAddr)
+	})
 }

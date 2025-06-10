@@ -2,8 +2,9 @@
 .sidebar {
     width: 250px;
     height: 100vh;
-    background-color: #f8f9fa;
-    padding: 20px;
+    /* background-color: #f8f9fa; */
+    background-color: greenyellow;
+    padding-left: 20px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
 
@@ -155,6 +156,13 @@
     color: #333;
     text-decoration: none;
     transition: background-color 0.3s;
+}
+
+.menu-item a span {
+    margin-bottom: 12px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 8px;
 }
 
 .menu-item a:hover {

@@ -1,7 +1,8 @@
 [basic]
 port2listen = 8080
-base_url = 'localhost:8080'
+base_url = 'http://localhost:8080'
 log_level = 4
+root_path = '/Users/xingfend/Documents/Project/blogo'
 
 [user]
 title = 'Blogo'

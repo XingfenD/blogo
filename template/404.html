@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>404 Not Found</title>
+    <link rel="stylesheet" href="/static/css/base.css">
+</head>
+<body>
+    {{template "sidebar" .}}
+    <main class="main">
+        <h1>😢 页面失踪啦</h1>
+        <p>您访问的 {{.Config.User.Title}}/{{.Config.User.Name}} 页面不存在</p>
+        {{template "footer" .}}
+    </main>
+</body>
+</html>

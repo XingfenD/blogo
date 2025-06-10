@@ -11,6 +11,7 @@ type Config struct {
 		BaseUrl     string `toml:"base_url"`
 		LogLevel    int    `toml:"log_level"`
 		Port2listen int    `toml:"port2listen"`
+		RootPath    string `toml:"root_path"`
 	}
 	User struct {
 		Name        string `toml:"name"`
