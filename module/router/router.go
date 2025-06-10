@@ -45,22 +45,24 @@ func StartServer(loaded_config config.Config) {
 }
 
 func loadRouter(loaded_config config.Config) {
-	icon_map, _ := loader.LoadIcons()
+	icon_map, _ := loader.LoadIcons(loaded_config.Basic.RootPath + "/static/icon")
 	/* the static files */
 	http.Handle("/static/", http.StripPrefix("/static/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		loader.Logger.Infof("Request for %s from %s", r.URL.Path, r.RemoteAddr)
-		fs := http.Dir("static")
+		fs := http.Dir(loaded_config.Basic.RootPath + "/static")
 		path := r.URL.Path
-
+		loader.Logger.Infof("Opening file %s", path)
 		file, err := fs.Open(path)
 		if err != nil {
 			http.NotFound(w, r)
+			loader.Logger.Error(err)
 			return
 		}
 		defer file.Close()
 
 		if info, _ := file.Stat(); info.IsDir() {
 			http.NotFound(w, r)
+			loader.Logger.Error(err)
 			return
 		}
 

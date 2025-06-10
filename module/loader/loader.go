@@ -19,9 +19,9 @@ func LoadLogger(logLevel int) {
 	Logger.Info("Logger initialized")
 }
 
-func LoadIcons() (map[string]string, error) {
+func LoadIcons(icon_path string) (map[string]string, error) {
 	icons := make(map[string]string)
-	err := filepath.Walk("static/icon", func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(icon_path, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
