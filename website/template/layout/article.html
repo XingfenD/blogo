@@ -1,0 +1,22 @@
+{{define "article"}}
+<article class="main-article">
+    <header class="article-header">
+        <div class="article-details">
+            {{if .Article.Category}}
+            <header class="article-category">
+                <a href="{{.Config.Basic.BaseUrl}}/categories/{{.Article.Category.Id}}">
+                    {{.Article.Category.Name}}
+                </a>
+            </header>
+            {{end}}
+            <div class="article-title-wrapper">
+                <h2 class="article-title">{{.Article.Title}}</h2>
+            </div>
+            <footer class="article-time"></footer>
+        </div>
+    </header>
+    <section class="article-content">
+        {{.Article.Content}}
+    </section>
+</article>
+{{end}}
