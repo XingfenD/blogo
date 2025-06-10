@@ -1,10 +1,12 @@
+@import url('footer.css');
 /* 新增 body 的 grid 布局样式 */
 body {
     display: grid; /* 设置为 grid 容器 */
     grid-template-columns: 250px 1fr; /* 第一列宽度 250px，第二列占据剩余空间 */
     margin: 0; /* 移除默认的 body 边距 */
+    background-color: #e2e8f0;
 }
 
 .main {
-    padding: 20px; /* 添加内边距 */
+    padding: 20px;
 }

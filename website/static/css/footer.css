@@ -1,0 +1,60 @@
+/* 页脚容器 */
+.site-footer {
+    /* padding: 1.5rem; */
+    padding-top: 20px;
+    position: relative;
+    display: block;
+    min-height: 120px;
+}
+
+/* 新增分隔线样式 */
+.site-footer::before {
+    position: relative;
+    content: '';
+    display: block;
+    left: 50px;
+    margin-bottom: 20px;
+    transform: translateX(-50%);
+    width: 100px;  /* 缩短长度 */
+    height: 5px;  /* 加粗线条 */
+    background: #cbd5e0;
+}
+
+/* 调整底部元素定位 */
+/* 版权信息 */
+.copyright {
+    color: #2d3748; /* 使用现代深灰色 */
+    display: block;
+    text-align: left;
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+
+/* 底部信息栏 */
+.powerby {
+    color: #718096; /* 与侧边栏描述同色系 */
+    display: block;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+.powerby a {
+    color: #81e6d9; /* 改为青灰色链接 */
+}
+
+.powerby a:hover {
+    color: #fff;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .main-article {
+        margin: 0 15px;
+        padding: 15px;
+    }
+
+    .article-title {
+        font-size: 2rem;
+    }
+}

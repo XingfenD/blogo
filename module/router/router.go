@@ -132,7 +132,7 @@ func loadRouter() {
 		}
 		loader.Logger.Info("Loading template successfully")
 		aboutMeta, err := sqlite_db.GetAboutMeta()
-		loader.Logger.Info(aboutMeta)
+		// loader.Logger.Info(aboutMeta)
 		if err != nil {
 			http.Error(w, "Failed to get about meta", http.StatusInternalServerError)
 			loader.Logger.Error(err)
