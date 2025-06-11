@@ -154,8 +154,7 @@ func loadRouter() {
 	})
 
 	loadArchives()
-
-	loadAPI()
+	loadPosts()
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		loader.Logger.Infof("Request for %s from %s", r.URL.Path, r.RemoteAddr)
@@ -165,51 +164,6 @@ func loadRouter() {
 			http.NotFound(w, r)
 		}
 	})
-}
-
-func loadPost() {
-	postMux := http.NewServeMux()
-	postMux.HandleFunc("/post/", func(w http.ResponseWriter, r *http.Request) {
-		loader.Logger.Infof("Request for %s from %s", r.URL.Path, r.RemoteAddr)
-	})
-
-	postMux.HandleFunc("/post/{blog_name}.html", func(w http.ResponseWriter, r *http.Request) {
-		loader.Logger.Infof("Request for /post/{blog_name}.html from %s", r.RemoteAddr)
-		t := template.New("post.html").Funcs(funcMap)
-		t, err := t.ParseFiles(
-			loadedConfig.Basic.RootPath+"/template/page/post.html",
-			loadedConfig.Basic.RootPath+"/template/layout/footer.html",
-			loadedConfig.Basic.RootPath+"/template/layout/sidebar.html",
-			loadedConfig.Basic.RootPath+"/template/layout/article.html",
-		)
-		if err != nil {
-			http.Error(w, "Failed to parse template", http.StatusInternalServerError)
-			loader.Logger.Error(err)
-			return
-		}
-		loader.Logger.Info("Loading template successfully")
-		err = t.Execute(w, struct {
-			Config  config.Config
-			Icons   map[string]string
-			Article sqlite_db.ArticleMeta
-		}{
-			Config: loadedConfig,
-			Icons:  iconMap,
-			Article: sqlite_db.ArticleMeta{
-				Title:        "Sample Post Title",
-				CreateDate:   time.Now().Format("2006-01-02"),
-				LastModified: time.Now().Format("2006-01-02"),
-				Description:  "This is a sample post description.",
-				Content:      "This is the content of the sample post.",
-			},
-		})
-		if err != nil {
-			http.Error(w, "Failed to execute template", http.StatusInternalServerError)
-			loader.Logger.Error(err)
-		}
-	})
-
-	http.Handle("/post/", postMux)
 }
 
 func loadArchives() {
@@ -273,7 +227,7 @@ func loadArchives() {
 							Time string
 						}{
 							Name: category.Name,
-							Url:  fmt.Sprintf("/archives/categories/%d", category.Id),
+							Url:  fmt.Sprintf("archives/categories/%d", category.Id),
 							Time: category.Time,
 						})
 					}
@@ -354,7 +308,7 @@ func loadArchives() {
 							Time string
 						}{
 							Name: article.Title,
-							Url:  fmt.Sprintf("/post/%d.html", article.BlogId),
+							Url:  fmt.Sprintf("posts/%s.html", article.DirName),
 							Time: article.CreateDate,
 						})
 					}
@@ -417,11 +371,91 @@ func loadArchives() {
 	http.Handle("/archives/", archivesMux)
 }
 
-func loadAPI() {
-	apiMux := http.NewServeMux()
-	apiMux.HandleFunc("/api/hello", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello, World!"))
+func loadPosts() {
+	postsMux := http.NewServeMux()
+	postsMux.HandleFunc("/posts/", func(w http.ResponseWriter, r *http.Request) {
+		fullPath := r.URL.Path
+
+		suffix := strings.TrimPrefix(
+			path.Clean(fullPath),
+			path.Clean("/posts/"),
+		)
+		if suffix == "" {
+			loader.Logger.Infof("Request for /posts/ from %s", r.RemoteAddr)
+			t := template.New("section.html").Funcs(funcMap)
+			t, err := t.ParseFiles(
+				loadedConfig.Basic.RootPath+"/template/page/section.html",
+				loadedConfig.Basic.RootPath+"/template/layout/footer.html",
+				loadedConfig.Basic.RootPath+"/template/layout/sidebar.html",
+			)
+			if err != nil {
+				http.Error(w, "Failed to parse template", http.StatusInternalServerError)
+				loader.Logger.Error(err)
+				return
+			}
+			loader.Logger.Info("Loading template successfully")
+			posts := sqlite_db.GetArticleList()
+			err = t.Execute(w, struct {
+				Config       config.Config
+				Icons        map[string]string
+				SectionTitle string
+				SectionName  string
+				SectionCount int
+				Terms        []struct {
+					Name string
+					Url  string
+					Time string
+				}
+			}{
+				Config:       loadedConfig,
+				Icons:        iconMap,
+				SectionTitle: "POSTS",
+				SectionName:  "posts",
+				SectionCount: len(posts),
+				Terms: func() []struct {
+					Name string
+					Url  string
+					Time string
+				} {
+					var terms []struct {
+						Name string
+						Url  string
+						Time string
+					}
+					for _, article := range posts {
+						terms = append(terms, struct {
+							Name string
+							Url  string
+							Time string
+						}{
+							Name: article.Title,
+							Url:  fmt.Sprintf("posts/%s.html", article.DirName),
+							Time: article.CreateDate,
+						})
+
+					}
+					return terms
+				}(),
+			})
+			if err != nil {
+				http.Error(w, "Failed to execute template", http.StatusInternalServerError)
+				loader.Logger.Error(err)
+				return
+			}
+
+			return
+		}
+		loader.Logger.Infof("Post path: %s (From %s)", suffix, r.RemoteAddr)
+		parts := strings.Split(suffix, "/")
+		if len(parts) > 1 {
+
+			// articleDirName := parts[1]
+
+			return
+		}
+
+		loader.Logger.Infof("Request for %s from %s", r.URL.Path, r.RemoteAddr)
 	})
 
-	http.Handle("/api/", apiMux)
+	http.Handle("/posts/", postsMux)
 }

@@ -20,7 +20,7 @@ func InitDB(db_path string) error {
 	createTableSQL := `
 		CREATE TABLE IF NOT EXISTS "blog_posts" (
 			"blog_id" INTEGER NOT NULL UNIQUE,
-			"blog_name" TEXT NOT NULL UNIQUE,
+			"dir_name" TEXT NOT NULL UNIQUE,
 			"title" TEXT,
 			"description" TEXT,
 			"content" TEXT NOT NULL,
@@ -80,7 +80,7 @@ func exampleQuery() error {
 		(5, 'History'),
 		(6, 'Adventure');
 
-		INSERT INTO "blog_posts" ("blog_id", "blog_name", "title", "description", "content", "cate_id", "create_time", "last_modified") VALUES
+		INSERT INTO "blog_posts" ("blog_id", "dir_name", "title", "description", "content", "cate_id", "create_time", "last_modified") VALUES
 		(1, 'about', '关于blogo', 'blogo简介', 'blogo内容', NULL, '2025-06-01 10:00:00', '2025-06-01 10:00:00'),
 		(2, 'LifeHacks', 'Healthy Living Tips', 'Tips for a healthy lifestyle', 'Eating well and exercising regularly are key...', 2, '2025-06-02 11:00:00', '2025-06-02 11:00:00'),
 		(3, 'TravelDiary', 'Exploring Europe', 'A journey through Europe', 'Visiting historic cities and beautiful landscapes...', 3, '2025-06-03 12:00:00', '2025-06-03 12:00:00'),
@@ -127,7 +127,7 @@ func GetAboutMeta() (*ArticleMeta, error) {
 	row := db.QueryRow(`
         SELECT title, description, content, create_time, last_modified, cate_id
         FROM blog_posts
-        WHERE blog_name = 'about'`)
+        WHERE dir_name = 'about'`)
 
 	var meta ArticleMeta
 	var cateID sql.NullInt64 // 处理可能为NULL的分类ID
@@ -163,7 +163,7 @@ func GetAboutMeta() (*ArticleMeta, error) {
         FROM tags t
         INNER JOIN blog_tag bt ON t.id = bt.tag_id
         INNER JOIN blog_posts bp ON bt.blog_id = bp.blog_id
-        WHERE bp.blog_name = 'about'`)
+        WHERE bp.dir_name = 'about'`)
 	if err != nil {
 		loader.Logger.Error("Error querying tags:", err)
 		return &meta, nil
@@ -244,7 +244,7 @@ func GetCateById(cateId int) (string, error) {
 
 func GetArticlesByCategory(cateId int) []struct {
 	BlogId       int
-	BlogName     string
+	DirName      string
 	Title        string
 	CreateDate   string
 	LastModified string
@@ -254,7 +254,7 @@ func GetArticlesByCategory(cateId int) []struct {
 } {
 	var articles []struct {
 		BlogId       int
-		BlogName     string
+		DirName      string
 		Title        string
 		CreateDate   string
 		LastModified string
@@ -264,10 +264,10 @@ func GetArticlesByCategory(cateId int) []struct {
 	}
 
 	// 查询基础文章信息
-	// 修改查询语句添加 blog_name 字段
+
 	rows, err := db.Query(`
-        SELECT b.title, b.description, b.content, b.create_time, b.last_modified, 
-               b.blog_id, b.blog_name
+        SELECT b.title, b.description, b.content, b.create_time, b.last_modified,
+               b.blog_id, b.dir_name
         FROM blog_posts b
         WHERE b.cate_id = ?
         ORDER BY b.create_time DESC`, cateId)
@@ -280,7 +280,7 @@ func GetArticlesByCategory(cateId int) []struct {
 	for rows.Next() {
 		var article struct {
 			BlogId       int
-			BlogName     string
+			DirName      string
 			Title        string
 			CreateDate   string
 			LastModified string
@@ -288,8 +288,6 @@ func GetArticlesByCategory(cateId int) []struct {
 			Description  string
 			Content      string
 		}
-		var blogID int
-		var blogName string
 
 		err := rows.Scan(
 			&article.Title,
@@ -298,7 +296,7 @@ func GetArticlesByCategory(cateId int) []struct {
 			&article.CreateDate,
 			&article.LastModified,
 			&article.BlogId,
-			&article.BlogName,
+			&article.DirName,
 		)
 		if err != nil {
 			loader.Logger.Error("Error scanning article row:", err)
@@ -310,7 +308,7 @@ func GetArticlesByCategory(cateId int) []struct {
             SELECT t.name
             FROM tags t
             INNER JOIN blog_tag bt ON t.id = bt.tag_id
-            WHERE bt.blog_id = ?`, blogID)
+            WHERE bt.blog_id = ?`, article.BlogId)
 		if err != nil {
 			loader.Logger.Error("Error querying tags:", err)
 			continue
@@ -327,7 +325,7 @@ func GetArticlesByCategory(cateId int) []struct {
 		// 修改返回结构
 		articles = append(articles, struct {
 			BlogId       int
-			BlogName     string
+			DirName      string
 			Title        string
 			CreateDate   string
 			LastModified string
@@ -335,8 +333,8 @@ func GetArticlesByCategory(cateId int) []struct {
 			Description  string
 			Content      string
 		}{
-			BlogId:       blogID,
-			BlogName:     blogName, // 新增字段赋值
+			BlogId:       article.BlogId,
+			DirName:      article.DirName, // 新增字段赋值
 			Title:        article.Title,
 			CreateDate:   article.CreateDate,
 			LastModified: article.LastModified,
@@ -344,6 +342,94 @@ func GetArticlesByCategory(cateId int) []struct {
 			Description:  article.Description,
 			Content:      article.Content,
 		})
+	}
+
+	if err = rows.Err(); err != nil {
+		loader.Logger.Error("Error after scanning articles:", err)
+	}
+
+	return articles
+}
+
+func GetArticleList() []struct {
+	BlogId       int
+	DirName      string
+	Title        string
+	CreateDate   string
+	LastModified string
+	Tags         []string
+	Description  string
+	Content      string
+} {
+	var articles []struct {
+		BlogId       int
+		DirName      string
+		Title        string
+		CreateDate   string
+		LastModified string
+		Tags         []string
+		Description  string
+		Content      string
+	}
+
+	// 查询所有文章基础信息
+	rows, err := db.Query(`
+        SELECT b.title, b.description, b.content, b.create_time, b.last_modified,
+               b.blog_id, b.dir_name
+        FROM blog_posts b
+        ORDER BY b.create_time DESC`)
+	if err != nil {
+		loader.Logger.Error("Error querying articles:", err)
+		return articles
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var article struct {
+			BlogId       int
+			DirName      string
+			Title        string
+			CreateDate   string
+			LastModified string
+			Tags         []string
+			Description  string
+			Content      string
+		}
+
+		err := rows.Scan(
+			&article.Title,
+			&article.Description,
+			&article.Content,
+			&article.CreateDate,
+			&article.LastModified,
+			&article.BlogId,
+			&article.DirName,
+		)
+		if err != nil {
+			loader.Logger.Error("Error scanning article row:", err)
+			continue
+		}
+
+		// 查询标签信息（与 GetArticlesByCategory 相同逻辑）
+		tagRows, err := db.Query(`
+            SELECT t.name
+            FROM tags t
+            INNER JOIN blog_tag bt ON t.id = bt.tag_id
+            WHERE bt.blog_id = ?`, article.BlogId)
+		if err != nil {
+			loader.Logger.Error("Error querying tags:", err)
+			continue
+		}
+
+		for tagRows.Next() {
+			var tag string
+			if err := tagRows.Scan(&tag); err == nil {
+				article.Tags = append(article.Tags, tag)
+			}
+		}
+		tagRows.Close()
+
+		articles = append(articles, article)
 	}
 
 	if err = rows.Err(); err != nil {
