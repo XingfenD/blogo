@@ -27,3 +27,7 @@ icon = 'bilibili'
 
 [footer]
 custom_text = '星藏点雪，月隐晦明。'
+
+[archive]
+show_tags = true
+show_timeline = true

@@ -20,6 +20,7 @@
                 {{end}}
             </div>
         </div>
+        {{if .Config.Archive.ShowTags}}
         <h2 class="section-list">标签 - TAGS</h2>
         <div class="subsection-list">
             <div class="collection-list--tile">
@@ -30,6 +31,19 @@
                 {{end}}
             </div>
         </div>
+        {{end}}
+        {{if .Config.Archive.ShowTimeline}}
+        <h2 class="section-list">时间线 - TIMELINE</h2>
+        <div class="subsection-list">
+            <div class="collection-list--tile">
+                {{range .Tags}}
+                    <a href="{{$.Config.Basic.BaseUrl}}/archives/tags/{{.Id}}">
+                        <h2 class="collection-list--tile--title">{{.Name}}</h2>
+                    </a>
+                {{end}}
+            </div>
+        </div>
+        {{end}}
     </header>
     {{template "footer" .}}
     </main>

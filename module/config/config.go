@@ -33,6 +33,10 @@ type Config struct {
 	Footer struct {
 		CustomText string `toml:"custom_text"`
 	}
+	Archive struct {
+		ShowTags     bool `toml:"show_tags"`
+		ShowTimeline bool `toml:"show_timeline"`
+	}
 }
 
 func LoadConfig() Config {

@@ -55,7 +55,17 @@ func StartServer(loaded_config config.Config) {
 func loadRouter() {
 	iconMap, _ = loader.LoadIcons(loadedConfig.Basic.RootPath + "/static/icon")
 
-	/* the static files */
+	loadStatic()
+	loadHomepage()
+	loadCategories()
+	loadArchives()
+	loadAbout()
+	loadPosts()
+	loadRoot()
+
+}
+
+func loadStatic() {
 	http.Handle("/static/", http.StripPrefix("/static/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		loader.Logger.Infof("Request for %s from %s", r.URL.Path, r.RemoteAddr)
 		fs := http.Dir(loadedConfig.Basic.RootPath + "/static")
@@ -77,8 +87,20 @@ func loadRouter() {
 
 		http.FileServer(fs).ServeHTTP(w, r)
 	})))
+}
 
-	/* the main page */
+func loadRoot() {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		loader.Logger.Infof("Request for %s from %s", r.URL.Path, r.RemoteAddr)
+		if r.URL.Path == "/" {
+			http.Redirect(w, r, "/homepage.html", http.StatusFound)
+		} else {
+			http.NotFound(w, r)
+		}
+	})
+}
+
+func loadHomepage() {
 	http.HandleFunc("/homepage.html", func(w http.ResponseWriter, r *http.Request) {
 		var err error
 		loader.Logger.Infof("Request for /homepage.html from %s", r.RemoteAddr)
@@ -95,7 +117,9 @@ func loadRouter() {
 			loader.Logger.Error(err)
 		}
 	})
+}
 
+func loadAbout() {
 	http.HandleFunc("/about.html", func(w http.ResponseWriter, r *http.Request) {
 		loader.Logger.Infof("Request for /about.html from %s", r.RemoteAddr)
 
@@ -120,23 +144,38 @@ func loadRouter() {
 			loader.Logger.Error(err)
 		}
 	})
+}
 
-	loadArchives()
-	loadPosts()
-
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		loader.Logger.Infof("Request for %s from %s", r.URL.Path, r.RemoteAddr)
-		if r.URL.Path == "/" {
-			http.Redirect(w, r, "/homepage.html", http.StatusFound)
-		} else {
-			http.NotFound(w, r)
+func loadArchives() {
+	http.HandleFunc("/archives/", func(w http.ResponseWriter, r *http.Request) {
+		loader.Logger.Infof("Request for /archives from %s", r.RemoteAddr)
+		err := tpl.ArchiveTpl.Execute(w, struct {
+			Config     config.Config
+			Icons      map[string]string
+			Categories []struct {
+				Name string
+				Id   int
+				Time string
+			}
+			Tags []struct {
+				Name string
+				Id   int
+			}
+		}{
+			Config:     loadedConfig,
+			Icons:      iconMap,
+			Categories: sqlite_db.GetCategoryList(),
+			Tags:       sqlite_db.GetTagList(),
+		})
+		if err != nil {
+			http.Error(w, "Failed to execute template", http.StatusInternalServerError)
+			loader.Logger.Error(err)
 		}
 	})
 }
 
-func loadArchives() {
-	archivesMux := http.NewServeMux()
-	archivesMux.HandleFunc("/archives/categories/", func(w http.ResponseWriter, r *http.Request) {
+func loadCategories() {
+	http.HandleFunc("/archives/categories/", func(w http.ResponseWriter, r *http.Request) {
 		// 获取完整请求路径
 		fullPath := r.URL.Path
 
@@ -272,43 +311,10 @@ func loadArchives() {
 
 		http.NotFound(w, r)
 	})
-
-	// archivesMux.HandleFunc("/archives/collections/", func(w http.ResponseWriter, r *http.Request) {
-	// 	loader.Logger.Infof("Request for %s from %s", r.URL.Path, r.RemoteAddr)
-	// 	w.Write(fmt.Appendf(nil, "Request for %s from %s", r.URL.Path, r.RemoteAddr))
-	// })
-
-	archivesMux.HandleFunc("/archives/", func(w http.ResponseWriter, r *http.Request) {
-		loader.Logger.Infof("Request for /archives from %s", r.RemoteAddr)
-		err := tpl.ArchiveTpl.Execute(w, struct {
-			Config     config.Config
-			Icons      map[string]string
-			Categories []struct {
-				Name string
-				Id   int
-				Time string
-			}
-			Tags []struct {
-				Name string
-				Id   int
-			}
-		}{
-			Config:     loadedConfig,
-			Icons:      iconMap,
-			Categories: sqlite_db.GetCategoryList(),
-			Tags:       sqlite_db.GetTagList(),
-		})
-		if err != nil {
-			http.Error(w, "Failed to execute template", http.StatusInternalServerError)
-			loader.Logger.Error(err)
-		}
-	})
-	http.Handle("/archives/", archivesMux)
 }
 
 func loadPosts() {
-	postsMux := http.NewServeMux()
-	postsMux.HandleFunc("/posts/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/posts/", func(w http.ResponseWriter, r *http.Request) {
 		fullPath := r.URL.Path
 
 		suffix := strings.TrimPrefix(
@@ -400,6 +406,4 @@ func loadPosts() {
 
 		loader.Logger.Infof("Request for %s from %s", r.URL.Path, r.RemoteAddr)
 	})
-
-	http.Handle("/posts/", postsMux)
 }

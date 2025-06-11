@@ -64,43 +64,43 @@ func InitDB(db_path string) error {
 	return nil
 }
 
-func exampleQuery() error {
-	exampleSQL := `
-		INSERT INTO "categories" ("cate_id", "cate_name") VALUES
-		(1, 'Technology'),
-		(2, 'Lifestyle'),
-		(3, 'Travel'),
-		(4, 'Food');
+// func exampleQuery() error {
+// 	exampleSQL := `
+// 		INSERT INTO "categories" ("cate_id", "cate_name") VALUES
+// 		(1, 'Technology'),
+// 		(2, 'Lifestyle'),
+// 		(3, 'Travel'),
+// 		(4, 'Food');
 
-		INSERT INTO "tags" ("id", "name") VALUES
-		(1, 'Programming'),
-		(2, 'Health'),
-		(3, 'Nature'),
-		(4, 'Cooking'),
-		(5, 'History'),
-		(6, 'Adventure');
+// 		INSERT INTO "tags" ("id", "name") VALUES
+// 		(1, 'Programming'),
+// 		(2, 'Health'),
+// 		(3, 'Nature'),
+// 		(4, 'Cooking'),
+// 		(5, 'History'),
+// 		(6, 'Adventure');
 
-		INSERT INTO "blog_posts" ("blog_id", "dir_name", "title", "description", "content", "cate_id", "create_time", "last_modified") VALUES
-		(1, 'about', '关于blogo', 'blogo简介', 'blogo内容', NULL, '2025-06-01 10:00:00', '2025-06-01 10:00:00'),
-		(2, 'LifeHacks', 'Healthy Living Tips', 'Tips for a healthy lifestyle', 'Eating well and exercising regularly are key...', 2, '2025-06-02 11:00:00', '2025-06-02 11:00:00'),
-		(3, 'TravelDiary', 'Exploring Europe', 'A journey through Europe', 'Visiting historic cities and beautiful landscapes...', 3, '2025-06-03 12:00:00', '2025-06-03 12:00:00'),
-		(4, 'FoodieBlog', 'Best Italian Recipes', 'Delicious Italian dishes', 'From pasta to pizza, Italian cuisine is amazing...', 4, '2025-06-04 13:00:00', '2025-06-04 13:00:00');
+// 		INSERT INTO "blog_posts" ("blog_id", "dir_name", "title", "description", "content", "cate_id", "create_time", "last_modified") VALUES
+// 		(1, 'about', '关于blogo', 'blogo简介', 'blogo内容', NULL, '2025-06-01 10:00:00', '2025-06-01 10:00:00'),
+// 		(2, 'LifeHacks', 'Healthy Living Tips', 'Tips for a healthy lifestyle', 'Eating well and exercising regularly are key...', 2, '2025-06-02 11:00:00', '2025-06-02 11:00:00'),
+// 		(3, 'TravelDiary', 'Exploring Europe', 'A journey through Europe', 'Visiting historic cities and beautiful landscapes...', 3, '2025-06-03 12:00:00', '2025-06-03 12:00:00'),
+// 		(4, 'FoodieBlog', 'Best Italian Recipes', 'Delicious Italian dishes', 'From pasta to pizza, Italian cuisine is amazing...', 4, '2025-06-04 13:00:00', '2025-06-04 13:00:00');
 
-		INSERT INTO "blog_tag" ("blog_id", "tag_id") VALUES
-		(1, 1), -- TechBlog tagged with Programming
-		(2, 2), -- LifeHacks tagged with Health
-		(3, 3), -- TravelDiary tagged with Nature
-		(4, 4), -- FoodieBlog tagged with Cooking
-		(1, 5), -- TechBlog also tagged with History
-		(3, 6); -- TravelDiary also tagged with Adventure
-	`
-	_, err := db.Exec(exampleSQL)
-	if err != nil {
-		loader.Logger.Error("Error executing example query:", err)
-		return err
-	}
-	return nil
-}
+// 		INSERT INTO "blog_tag" ("blog_id", "tag_id") VALUES
+// 		(1, 1), -- TechBlog tagged with Programming
+// 		(2, 2), -- LifeHacks tagged with Health
+// 		(3, 3), -- TravelDiary tagged with Nature
+// 		(4, 4), -- FoodieBlog tagged with Cooking
+// 		(1, 5), -- TechBlog also tagged with History
+// 		(3, 6); -- TravelDiary also tagged with Adventure
+// 	`
+// 	_, err := db.Exec(exampleSQL)
+// 	if err != nil {
+// 		loader.Logger.Error("Error executing example query:", err)
+// 		return err
+// 	}
+// 	return nil
+// }
 
 func CloseDB() {
 	err := db.Close()
