@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/XingfenD/blogo/module/loader"
 	_ "github.com/mattn/go-sqlite3"
@@ -113,8 +114,11 @@ type ArticleMeta struct {
 	Title        string
 	CreateDate   string
 	LastModified string
-	Tags         []string
-	Category     struct {
+	Tags         []struct {
+		Name string
+		Url  string
+	}
+	Category struct {
 		Name string
 		Id   int
 	}
@@ -159,7 +163,7 @@ func GetAboutMeta() (*ArticleMeta, error) {
 
 	// 查询标签信息
 	tagsRows, err := db.Query(`
-        SELECT t.name
+        SELECT t.name, t.id
         FROM tags t
         INNER JOIN blog_tag bt ON t.id = bt.tag_id
         INNER JOIN blog_posts bp ON bt.blog_id = bp.blog_id
@@ -172,10 +176,17 @@ func GetAboutMeta() (*ArticleMeta, error) {
 
 	for tagsRows.Next() {
 		var tag string
-		if err := tagsRows.Scan(&tag); err != nil {
+		var tagId int
+		if err := tagsRows.Scan(&tag, &tagId); err != nil {
 			continue
 		}
-		meta.Tags = append(meta.Tags, tag)
+		meta.Tags = append(meta.Tags, struct {
+			Name string
+			Url  string
+		}{
+			Name: tag,
+			Url:  fmt.Sprintf("archives/tags/%d", tagId),
+		})
 	}
 
 	return &meta, nil
@@ -218,7 +229,7 @@ func GetArticleMetaByDir(dirName string) (*ArticleMeta, error) {
 
 	// 查询标签信息
 	tagsRows, err := db.Query(`
-        SELECT t.name
+        SELECT t.name, t.id
         FROM tags t
         INNER JOIN blog_tag bt ON t.id = bt.tag_id
         INNER JOIN blog_posts bp ON bt.blog_id = bp.blog_id
@@ -231,10 +242,17 @@ func GetArticleMetaByDir(dirName string) (*ArticleMeta, error) {
 
 	for tagsRows.Next() {
 		var tag string
-		if err := tagsRows.Scan(&tag); err != nil {
+		var tagId int
+		if err := tagsRows.Scan(&tag, &tagId); err != nil {
 			continue
 		}
-		meta.Tags = append(meta.Tags, tag)
+		meta.Tags = append(meta.Tags, struct {
+			Name string
+			Url  string
+		}{
+			Name: tag,
+			Url:  fmt.Sprintf("archives/tags/%d", tagId),
+		})
 	}
 
 	return &meta, nil

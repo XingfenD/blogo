@@ -17,63 +17,6 @@
     color: #a0aec0;
 }
 
-/* 汉堡菜单按钮样式 */
-.hamburger {
-    padding: 15px 15px;
-    display: inline-block;
-    cursor: pointer;
-    transition-property: opacity, filter;
-    transition-duration: 0.15s;
-    transition-timing-function: linear;
-    font: inherit;
-    color: inherit;
-    text-transform: none;
-    background-color: transparent;
-    border: 0;
-    margin: 0;
-    overflow: visible;
-}
-
-.hamburger-box {
-    width: 40px;
-    height: 24px;
-    display: inline-block;
-    position: relative;
-}
-
-.hamburger-inner {
-    display: block;
-    top: 50%;
-    margin-top: -2px;
-}
-
-.hamburger-inner,
-.hamburger-inner::before,
-.hamburger-inner::after {
-    width: 40px;
-    height: 4px;
-    background-color: #000;
-    border-radius: 4px;
-    position: absolute;
-    transition-property: transform;
-    transition-duration: 0.15s;
-    transition-timing-function: ease;
-}
-
-.hamburger-inner::before,
-.hamburger-inner::after {
-    content: "";
-    display: block;
-}
-
-.hamburger-inner::before {
-    top: -10px;
-}
-
-.hamburger-inner::after {
-    bottom: -10px;
-}
-
 /* 头像容器样式 */
 .site-avatar {
     position: relative;
@@ -154,21 +97,32 @@
 
 /* 主菜单样式 */
 .menu {
+    align-items: flex-start;
     list-style-type: none;
+    flex-direction: column;
+    display: flex;
     padding: 0;
 }
 
+.menu-item {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
 .menu-item a {
-    display: block;
-    padding: 10px;
+    padding: 10px 0 10px 0;
+    display: flex;
+    width: 100%;
     color: #333;
     text-decoration: none;
     transition: background-color 0.3s;
 }
 
 .menu-item a span {
-    margin-bottom: 12px;
-    display: inline-block;
+    position: relative;
+    margin: auto 0 auto 0px;
+    flex: 1;
     vertical-align: middle;
     margin-left: 8px;
 }

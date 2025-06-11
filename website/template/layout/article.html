@@ -32,5 +32,12 @@
     <section class="article-content">
         {{.Article.Content}}
     </section>
+    <footer class="article-footer">
+        <div class="article-tags">
+            {{range .Article.Tags}}
+            <a href="{{$.Config.Basic.BaseUrl}}/{{.Url}}">{{.Name}}</a>
+            {{end}}
+        </div>
+    </footer>
 </article>
 {{end}}
