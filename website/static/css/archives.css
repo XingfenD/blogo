@@ -1,0 +1,64 @@
+/* 主内容区调整 */
+.main.full-width {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* 分类标题样式 */
+.section-list {
+    color: #2d3748;
+    font-size: 1.5rem;
+    margin: 2rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #cbd5e0;
+}
+
+/* 子分类容器 */
+.subsection-list {
+    margin-bottom: 3rem;
+}
+
+/* 分类网格布局 */
+.collection-list--tile {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+/* 分类卡片样式 */
+.collection-list--tile--title {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 0;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 1.1rem;
+    color: #2d3748;
+}
+
+/* 链接交互效果 */
+.collection-list--tile a {
+    text-decoration: none;
+}
+
+.collection-list--tile--title:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    color: #007bff;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .main.full-width {
+        padding: 20px 15px;
+    }
+    .collection-list--tile {
+        grid-template-columns: 1fr;
+    }
+    .collection-list--tile--title {
+        padding: 1rem;
+    }
+}

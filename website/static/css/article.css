@@ -7,15 +7,6 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* 文章标题 */
-.article-title {
-    font-size: 2.5rem;
-    color: #333;
-    margin-bottom: 1.5rem;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 0.5em;
-}
-
 /* 分类标签 */
 .article-category a {
     display: inline-block;
@@ -31,6 +22,63 @@
 .article-category a:hover {
     background: #e9ecef;
     transform: translateY(-1px);
+}
+
+/* 文章标题 */
+.article-title {
+    margin: 0;
+}
+
+.article-title a {
+    /* remove the underline */
+    text-decoration: none;
+    color: #333;
+    font-size: 25px;
+}
+
+/* 文章副标题 */
+.article-subtitle {
+    color: #888;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    font-weight: 400;
+}
+
+/* 时间信息容器 */
+.article-time {
+    display: flex;
+    gap: 1.5rem;
+    border-top: 1px solid #eee;
+}
+
+/* 单个时间项 */
+.article-time div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #777;
+    font-size: 0.9rem;
+}
+
+/* 时间文本 */
+.article-time time {
+    font-family: monospace;
+    letter-spacing: -0.5px;
+}
+
+.article-time svg {
+    max-width: 20px;
+    stroke-width: 1.33;
+}
+
+/* 发布时间特定样式 */
+.article-time--published {
+    color: #666; /* 绿色表示创建时间 */
+}
+
+/* 最后修改时间样式 */
+.article-lastmod {
+    color: #666; /* 橙色表示修改时间 */
 }
 
 /* 文章内容 */

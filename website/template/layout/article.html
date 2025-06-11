@@ -2,7 +2,7 @@
 <article class="main-article">
     <header class="article-header">
         <div class="article-details">
-            {{if .Article.Category}}
+            {{if .Article.Category.Id}}
             <header class="article-category">
                 <a href="{{.Config.Basic.BaseUrl}}/categories/{{.Article.Category.Id}}">
                     {{.Article.Category.Name}}
@@ -10,9 +10,23 @@
             </header>
             {{end}}
             <div class="article-title-wrapper">
-                <h2 class="article-title">{{.Article.Title}}</h2>
+                <h2 class="article-title">
+                    <a href="">
+                        {{.Article.Title}}
+                    </a>
+                </h2>
+                <h3 class="article-subtitle">{{.Article.Description}}</h3>
             </div>
-            <footer class="article-time"></footer>
+            <footer class="article-time">
+                <div>
+                    {{index .Icons "date"}}
+                    <time class="article-time--published">{{.Article.CreateDate}}</time>
+                </div>
+                <div>
+                    {{index .Icons "clock"}}
+                    <time class="article-lastmod">{{.Article.LastModified}}</time>
+                </div>
+            </footer>
         </div>
     </header>
     <section class="article-content">

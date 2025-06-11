@@ -1,0 +1,96 @@
+/* 主内容区调整 */
+.main.full-width {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* 分类标题 */
+.section-tilte {
+    color: #2d3748;
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* 分类卡片容器 */
+.section-card {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    margin-bottom: 3rem;
+}
+
+/* 分类详细信息 */
+.section-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.section-count {
+    color: #718096;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.section-term {
+    color: #2d3748;
+    font-size: 2rem;
+    margin: 0;
+}
+
+/* 紧凑文章列表 */
+.article-list--compact {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.article-list--compact article {
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 1.5rem;
+}
+
+.article-list--compact article:last-child {
+    border-bottom: none;
+}
+
+/* 文章详情 */
+.article-details {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.article-title {
+    color: #2d3748;
+    font-size: 1.25rem;
+    margin: 0;
+    transition: color 0.2s ease;
+}
+
+.article-title:hover {
+    color: #007bff;
+}
+
+/* 时间样式 */
+.article-time {
+    color: #718096;
+    font-size: 0.875rem;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .main.full-width {
+        padding: 20px 15px;
+    }
+
+    .section-card {
+        padding: 1.5rem;
+    }
+
+    .section-term {
+        font-size: 1.5rem;
+    }
+}

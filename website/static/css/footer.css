@@ -40,7 +40,8 @@
 }
 
 .powerby a {
-    color: #81e6d9; /* 改为青灰色链接 */
+    color: #666; /* 改为青灰色链接 */
+    text-decoration: none;
 }
 
 .powerby a:hover {

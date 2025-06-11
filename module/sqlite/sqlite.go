@@ -180,3 +180,175 @@ func GetAboutMeta() (*ArticleMeta, error) {
 
 	return &meta, nil
 }
+
+func GetCategoryList() []struct {
+	Name string
+	Id   int
+	Time string
+} {
+	var categories []struct {
+		Name string
+		Id   int
+		Time string
+	}
+
+	rows, err := db.Query(`
+        SELECT cate_id, cate_name
+        FROM categories
+        ORDER BY cate_id`)
+	if err != nil {
+		loader.Logger.Error("Error querying categories:", err)
+		return categories
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var cate struct {
+			Name string
+			Id   int
+		}
+		if err := rows.Scan(&cate.Id, &cate.Name); err != nil {
+			loader.Logger.Error("Error scanning category row:", err)
+			continue
+		}
+		categories = append(categories, struct {
+			Name string
+			Id   int
+			Time string
+		}{
+			Name: cate.Name,
+			Id:   cate.Id,
+			Time: "",
+		})
+	}
+
+	if err = rows.Err(); err != nil {
+		loader.Logger.Error("Error after scanning categories:", err)
+	}
+
+	return categories
+}
+
+func GetCateById(cateId int) (string, error) {
+	var cateName string
+	err := db.QueryRow(`
+        SELECT cate_name
+        FROM categories
+        WHERE cate_id =?`, cateId).Scan(&cateName)
+	if err != nil {
+		loader.Logger.Error("Error querying category by ID:", err)
+		return "", err
+	}
+	return cateName, nil
+}
+
+func GetArticlesByCategory(cateId int) []struct {
+	BlogId       int
+	BlogName     string
+	Title        string
+	CreateDate   string
+	LastModified string
+	Tags         []string
+	Description  string
+	Content      string
+} {
+	var articles []struct {
+		BlogId       int
+		BlogName     string
+		Title        string
+		CreateDate   string
+		LastModified string
+		Tags         []string
+		Description  string
+		Content      string
+	}
+
+	// 查询基础文章信息
+	// 修改查询语句添加 blog_name 字段
+	rows, err := db.Query(`
+        SELECT b.title, b.description, b.content, b.create_time, b.last_modified, 
+               b.blog_id, b.blog_name
+        FROM blog_posts b
+        WHERE b.cate_id = ?
+        ORDER BY b.create_time DESC`, cateId)
+	if err != nil {
+		loader.Logger.Error("Error querying articles:", err)
+		return articles
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var article struct {
+			BlogId       int
+			BlogName     string
+			Title        string
+			CreateDate   string
+			LastModified string
+			Tags         []string
+			Description  string
+			Content      string
+		}
+		var blogID int
+		var blogName string
+
+		err := rows.Scan(
+			&article.Title,
+			&article.Description,
+			&article.Content,
+			&article.CreateDate,
+			&article.LastModified,
+			&article.BlogId,
+			&article.BlogName,
+		)
+		if err != nil {
+			loader.Logger.Error("Error scanning article row:", err)
+			continue
+		}
+
+		// 查询标签信息
+		tagRows, err := db.Query(`
+            SELECT t.name
+            FROM tags t
+            INNER JOIN blog_tag bt ON t.id = bt.tag_id
+            WHERE bt.blog_id = ?`, blogID)
+		if err != nil {
+			loader.Logger.Error("Error querying tags:", err)
+			continue
+		}
+
+		for tagRows.Next() {
+			var tag string
+			if err := tagRows.Scan(&tag); err == nil {
+				article.Tags = append(article.Tags, tag)
+			}
+		}
+		tagRows.Close()
+
+		// 修改返回结构
+		articles = append(articles, struct {
+			BlogId       int
+			BlogName     string
+			Title        string
+			CreateDate   string
+			LastModified string
+			Tags         []string
+			Description  string
+			Content      string
+		}{
+			BlogId:       blogID,
+			BlogName:     blogName, // 新增字段赋值
+			Title:        article.Title,
+			CreateDate:   article.CreateDate,
+			LastModified: article.LastModified,
+			Tags:         article.Tags,
+			Description:  article.Description,
+			Content:      article.Content,
+		})
+	}
+
+	if err = rows.Err(); err != nil {
+		loader.Logger.Error("Error after scanning articles:", err)
+	}
+
+	return articles
+}

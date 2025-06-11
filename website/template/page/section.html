@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/css/section.css">
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/sidebar.css">
+</head>
+<body>
+    {{template "sidebar" .}}
+    <main class="main full-width">
+        <header>
+            <h3 class="section-tilte">{{.SectionTitle}}</h3>
+            <div class="section-card">
+                <div class="section-details">
+                    <h3 class="section-count">{{.SectionCount}} PAGES</h3>
+                    <h1 class="section-term">{{.SectionName}}</h1>
+                </div>
+            </div>
+        </header>
+        <section class="article-list--compact">
+            {{range .Terms}}
+            <article>
+                <a href="{{$.Config.Basic.BaseUrl}}/{{.Url}}">
+                    <div class="article-details"
+                        <h2 class="article-title">{{.Name}}</h2>
+                        {{if .Time}}
+                        <footer class="article-time">
+                            <time datetime="{{.Time}}">{{.Time}}</time>
+                        </footer>
+                        {{end}}
+                    </div>
+                </a>
+            </article>
+            {{end}}
+        </section>
+    {{template "footer" .}}
+    </main>
+</body>
