@@ -35,13 +35,22 @@
         {{if .Config.Archive.ShowTimeline}}
         <h2 class="section-list">时间线 - TIMELINE</h2>
         <div class="subsection-list">
-            <div class="collection-list--tile">
-                {{range .Tags}}
-                    <a href="{{$.Config.Basic.BaseUrl}}/archives/tags/{{.Id}}">
-                        <h2 class="collection-list--tile--title">{{.Name}}</h2>
+            {{$years := .ArticlesOrderByYear}}
+            {{range $year := sortByYearDesc (keys $years)}}
+            <div class="year-group">
+                <h3>{{$year}}</h3>
+                <div class="article-list">
+                    {{range getMapValue $years $year}}
+                    <article class="article-list--tile">
+                    <a href="{{$.Config.Basic.BaseUrl}}/posts/{{.DirName}}">
+                        <h2 class="article-list--tile--title">{{.Title}}</h2>
+                        <time>{{.Time}}</time>
                     </a>
-                {{end}}
+                    </article>
+                    {{end}}
+                </div>
             </div>
+            {{end}}
         </div>
         {{end}}
     </header>

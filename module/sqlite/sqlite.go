@@ -339,6 +339,19 @@ func GetTagList() []struct {
 	return tags
 }
 
+func GetTagById(tagId int) (string, error) {
+	var tagName string
+	err := db.QueryRow(`
+        SELECT name
+        FROM tags
+        WHERE id =?`, tagId).Scan(&tagName)
+	if err != nil {
+		loader.Logger.Error("Error querying tag by ID:", err)
+		return "", err
+	}
+	return tagName, nil
+}
+
 func GetArticlesByCategory(cateId int) []struct {
 	BlogId       int
 	DirName      string
@@ -448,7 +461,7 @@ func GetArticlesByCategory(cateId int) []struct {
 	return articles
 }
 
-func GetArticleList() []struct {
+func GetArticlesByTag(tagId int) []struct {
 	BlogId       int
 	DirName      string
 	Title        string
@@ -469,12 +482,14 @@ func GetArticleList() []struct {
 		Content      string
 	}
 
-	// 查询所有文章基础信息
+	// 查询基础文章信息
 	rows, err := db.Query(`
         SELECT b.title, b.description, b.content, b.create_time, b.last_modified,
                b.blog_id, b.dir_name
         FROM blog_posts b
-        ORDER BY b.create_time DESC`)
+        INNER JOIN blog_tag bt ON b.blog_id = bt.blog_id
+        WHERE bt.tag_id = ?
+        ORDER BY b.create_time DESC`, tagId)
 	if err != nil {
 		loader.Logger.Error("Error querying articles:", err)
 		return articles
@@ -502,6 +517,106 @@ func GetArticleList() []struct {
 			&article.BlogId,
 			&article.DirName,
 		)
+		if err != nil {
+			loader.Logger.Error("Error scanning article row:", err)
+			continue
+		}
+
+		// 查询标签信息
+		tagRows, err := db.Query(`
+            SELECT t.name
+            FROM tags t
+            INNER JOIN blog_tag bt ON t.id = bt.tag_id
+            WHERE bt.blog_id = ?`, article.BlogId)
+		if err != nil {
+			loader.Logger.Error("Error querying tags:", err)
+			continue
+		}
+
+		for tagRows.Next() {
+			var tag string
+			if err := tagRows.Scan(&tag); err == nil {
+				article.Tags = append(article.Tags, tag)
+			}
+		}
+		tagRows.Close()
+
+		articles = append(articles, article)
+	}
+
+	if err = rows.Err(); err != nil {
+		loader.Logger.Error("Error after scanning articles:", err)
+	}
+
+	return articles
+}
+
+func GetArticleList() []struct {
+	BlogId       int
+	DirName      string
+	Title        string
+	CreateDate   string
+	LastModified string
+	Year         string // 新增年份字段
+	Tags         []string
+	Description  string
+	Content      string
+} {
+	var articles []struct {
+		BlogId       int
+		DirName      string
+		Title        string
+		CreateDate   string
+		LastModified string
+		Year         string
+		Tags         []string
+		Description  string
+		Content      string
+	}
+
+	// 修改查询语句添加年份字段和排序规则
+	rows, err := db.Query(`
+        SELECT
+            b.title,
+            b.description,
+            b.content,
+            b.create_time,
+            b.last_modified,
+            b.blog_id,
+            b.dir_name,
+            strftime('%Y', create_time) AS year
+        FROM blog_posts b
+        ORDER BY year DESC, b.create_time DESC`) // 按年份降序+时间降序
+	if err != nil {
+		loader.Logger.Error("Error querying articles:", err)
+		return articles
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var article struct {
+			BlogId       int
+			DirName      string
+			Title        string
+			CreateDate   string
+			LastModified string
+			Year         string
+			Tags         []string
+			Description  string
+			Content      string
+		}
+
+		err := rows.Scan(
+			&article.Title,
+			&article.Description,
+			&article.Content,
+			&article.CreateDate,
+			&article.LastModified,
+			&article.BlogId,
+			&article.DirName,
+			&article.Year, // 扫描新增的年份字段
+		)
+		// ... 保持后续标签查询逻辑不变 ...
 		if err != nil {
 			loader.Logger.Error("Error scanning article row:", err)
 			continue

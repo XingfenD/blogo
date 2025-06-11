@@ -58,6 +58,7 @@ func loadRouter() {
 	loadStatic()
 	loadHomepage()
 	loadCategories()
+	loadTags()
 	loadArchives()
 	loadAbout()
 	loadPosts()
@@ -161,11 +162,40 @@ func loadArchives() {
 				Name string
 				Id   int
 			}
+			ArticlesOrderByYear map[string][]struct {
+				Title   string
+				DirName string
+				Time    string
+			}
 		}{
 			Config:     loadedConfig,
 			Icons:      iconMap,
 			Categories: sqlite_db.GetCategoryList(),
 			Tags:       sqlite_db.GetTagList(),
+			ArticlesOrderByYear: func() map[string][]struct {
+				Title   string
+				DirName string
+				Time    string
+			} {
+				articles := sqlite_db.GetArticleList()
+				yearMap := make(map[string][]struct {
+					Title   string
+					DirName string
+					Time    string
+				})
+				for _, a := range articles {
+					yearMap[a.Year] = append(yearMap[a.Year], struct {
+						Title   string
+						DirName string
+						Time    string
+					}{
+						Title:   a.Title,
+						DirName: a.DirName,
+						Time:    a.CreateDate,
+					})
+				}
+				return yearMap
+			}(),
 		})
 		if err != nil {
 			http.Error(w, "Failed to execute template", http.StatusInternalServerError)
@@ -188,8 +218,6 @@ func loadCategories() {
 		// 处理空路径的情况（当访问 /archives/categories/ 时）
 		if suffix == "" {
 			loader.Logger.Infof("Request for /archives/categories/ from %s", r.RemoteAddr)
-
-			loader.Logger.Info("Loading template successfully")
 			err := tpl.SectionTpl.Execute(w, struct {
 				Config       config.Config
 				Icons        map[string]string
@@ -257,7 +285,6 @@ func loadCategories() {
 				loader.Logger.Error("Failed to get category name:", err)
 				return
 			}
-			loader.Logger.Info("Loading template successfully")
 			Articles := sqlite_db.GetArticlesByCategory(catID)
 
 			err = tpl.SectionTpl.Execute(w, struct {
@@ -405,5 +432,129 @@ func loadPosts() {
 		}
 
 		loader.Logger.Infof("Request for %s from %s", r.URL.Path, r.RemoteAddr)
+	})
+}
+
+func loadTags() {
+	http.HandleFunc("/archives/tags/", func(w http.ResponseWriter, r *http.Request) {
+		fullPath := r.URL.Path
+		suffix := strings.TrimPrefix(
+			path.Clean(fullPath),
+			path.Clean("/archives/tags/"),
+		)
+		if suffix == "" {
+			loader.Logger.Infof("Request for /archives/tags/ from %s", r.RemoteAddr)
+			err := tpl.SectionTpl.Execute(w, struct {
+				Config       config.Config
+				Icons        map[string]string
+				SectionTitle string
+				SectionName  string
+				SectionCount int
+				Terms        []struct {
+					Name string
+					Url  string
+					Time string
+				}
+			}{
+				Config:       loadedConfig,
+				Icons:        iconMap,
+				SectionTitle: "SECTION",
+				SectionName:  "tags",
+				SectionCount: len(sqlite_db.GetTagList()),
+				Terms: func() []struct {
+					Name string
+					Url  string
+					Time string
+				} {
+					var terms []struct {
+						Name string
+						Url  string
+						Time string
+					}
+					for _, tag := range sqlite_db.GetTagList() {
+						terms = append(terms, struct {
+							Name string
+							Url  string
+							Time string
+						}{
+							Name: tag.Name,
+							Url:  fmt.Sprintf("archives/tags/%d", tag.Id),
+						})
+					}
+					return terms
+				}(),
+			})
+			if err != nil {
+				http.Error(w, "Failed to execute template", http.StatusInternalServerError)
+				loader.Logger.Error(err)
+				return
+			}
+		}
+		loader.Logger.Infof("Tag path: %s (From %s)", suffix, r.RemoteAddr)
+		parts := strings.Split(suffix, "/")
+		if len(parts) > 1 {
+			tagID := parts[1]
+			loader.Logger.Infof("Requested tag ID: %s", tagID)
+			tagIDInt, err := strconv.Atoi(tagID)
+			if err != nil {
+				http.Error(w, "Invalid tag ID", http.StatusBadRequest)
+				loader.Logger.Error("Invalid tag ID:", err)
+				return
+			}
+			sectionName, err := sqlite_db.GetTagById(tagIDInt)
+			if err != nil {
+				http.Error(w, "Failed to get tag name", http.StatusInternalServerError)
+				loader.Logger.Error("Failed to get tag name:", err)
+				return
+			}
+			Articles := sqlite_db.GetArticlesByTag(tagIDInt)
+			err = tpl.SectionTpl.Execute(w, struct {
+				Config       config.Config
+				Icons        map[string]string
+				SectionTitle string
+				SectionName  string
+				SectionCount int
+				Terms        []struct {
+					Name string
+					Url  string
+					Time string
+				}
+			}{
+				Config:       loadedConfig,
+				Icons:        iconMap,
+				SectionTitle: "TAGS",
+				SectionName:  sectionName,
+				SectionCount: len(Articles),
+				Terms: func() []struct {
+					Name string
+					Url  string
+					Time string
+				} {
+					var terms []struct {
+						Name string
+						Url  string
+						Time string
+					}
+					for _, article := range Articles {
+						terms = append(terms, struct {
+							Name string
+							Url  string
+							Time string
+						}{
+							Name: article.Title,
+							Url:  fmt.Sprintf("posts/%s", article.DirName),
+							Time: article.CreateDate,
+						})
+					}
+					return terms
+				}(),
+			})
+			if err != nil {
+				http.Error(w, "Failed to execute template", http.StatusInternalServerError)
+				loader.Logger.Error(err)
+				return
+			}
+		}
+
 	})
 }

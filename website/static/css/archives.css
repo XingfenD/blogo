@@ -43,6 +43,53 @@
     color: #007bff;
 }
 
+/* 新增时间线样式 */
+.year-group {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.year-group h3 {
+    color: #2d3748;
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    padding-left: 1rem;
+    border-left: 4px solid #007bff;
+}
+
+.article-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 1.25rem; /* 调整间距 */
+}
+
+.article-list--tile {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;  /* 减少内边距 */
+    transition: all 0.2s ease;
+    font-size: 0.9rem;  /* 缩小字体 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.article-list--tile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: #007bff;
+}
+.article-list--tile a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.article-list--tile time {
+    display: block;
+    margin-top: 0.3rem;  /* 减少间距 */
+    font-size: 0.8rem;  /* 缩小时间字体 */
+    color: #718096;
+}
+
 /* 移动端适配 */
 @media (max-width: 768px) {
     .main.full-width {
@@ -52,6 +99,16 @@
         grid-template-columns: 1fr;
     }
     .collection-list--tile--title {
+        padding: 1rem;
+    }
+    .article-list--tile {
+        grid-template-columns: 1fr;
+    }
+    .year-group h3 {
+        font-size: 1.1rem;
+        padding-left: 0.75rem;
+    }
+    .article-list--tile--title {
         padding: 1rem;
     }
 }
