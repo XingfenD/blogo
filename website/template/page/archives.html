@@ -20,18 +20,16 @@
                 {{end}}
             </div>
         </div>
-        {{if .Collections}}
-        <h2 class="section-list">合集 - COLLECTIONS</h2>
+        <h2 class="section-list">标签 - TAGS</h2>
         <div class="subsection-list">
             <div class="collection-list--tile">
-                {{range .Collections}}
-                    <a href="{{$.Config.Basic.BaseUrl}}/archives/categories/{{.Id}}">
+                {{range .Tags}}
+                    <a href="{{$.Config.Basic.BaseUrl}}/archives/tags/{{.Id}}">
                         <h2 class="collection-list--tile--title">{{.Name}}</h2>
                     </a>
                 {{end}}
             </div>
         </div>
-        {{end}}
     </header>
     {{template "footer" .}}
     </main>

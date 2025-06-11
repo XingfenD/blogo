@@ -181,6 +181,65 @@ func GetAboutMeta() (*ArticleMeta, error) {
 	return &meta, nil
 }
 
+func GetArticleMetaByDir(dirName string) (*ArticleMeta, error) {
+	// 查询基础文章信息
+	row := db.QueryRow(`
+        SELECT title, description, content, create_time, last_modified, cate_id
+        FROM blog_posts
+        WHERE dir_name = ?`, dirName)
+
+	var meta ArticleMeta
+	var cateID sql.NullInt64
+
+	err := row.Scan(
+		&meta.Title,
+		&meta.Description,
+		&meta.Content,
+		&meta.CreateDate,
+		&meta.LastModified,
+		&cateID,
+	)
+	if err != nil {
+		loader.Logger.Error("Error querying article by dir:", err)
+		return nil, err
+	}
+
+	// 查询分类信息（如果存在）
+	if cateID.Valid {
+		err = db.QueryRow(`
+            SELECT cate_name
+            FROM categories
+            WHERE cate_id = ?`, cateID.Int64).Scan(&meta.Category.Name)
+		if err != nil {
+			loader.Logger.Error("Error querying category:", err)
+		}
+		meta.Category.Id = int(cateID.Int64)
+	}
+
+	// 查询标签信息
+	tagsRows, err := db.Query(`
+        SELECT t.name
+        FROM tags t
+        INNER JOIN blog_tag bt ON t.id = bt.tag_id
+        INNER JOIN blog_posts bp ON bt.blog_id = bp.blog_id
+        WHERE bp.dir_name = ?`, dirName)
+	if err != nil {
+		loader.Logger.Error("Error querying tags:", err)
+		return &meta, nil
+	}
+	defer tagsRows.Close()
+
+	for tagsRows.Next() {
+		var tag string
+		if err := tagsRows.Scan(&tag); err != nil {
+			continue
+		}
+		meta.Tags = append(meta.Tags, tag)
+	}
+
+	return &meta, nil
+}
+
 func GetCategoryList() []struct {
 	Name string
 	Id   int
@@ -240,6 +299,44 @@ func GetCateById(cateId int) (string, error) {
 		return "", err
 	}
 	return cateName, nil
+}
+
+func GetTagList() []struct {
+	Name string
+	Id   int
+} {
+	var tags []struct {
+		Name string
+		Id   int
+	}
+
+	rows, err := db.Query(`
+        SELECT id, name
+        FROM tags
+        ORDER BY id`)
+	if err != nil {
+		loader.Logger.Error("Error querying tags:", err)
+		return tags
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var tag struct {
+			Name string
+			Id   int
+		}
+		if err := rows.Scan(&tag.Id, &tag.Name); err != nil {
+			loader.Logger.Error("Error scanning tag row:", err)
+			continue
+		}
+		tags = append(tags, tag)
+	}
+
+	if err = rows.Err(); err != nil {
+		loader.Logger.Error("Error after scanning tags:", err)
+	}
+
+	return tags
 }
 
 func GetArticlesByCategory(cateId int) []struct {

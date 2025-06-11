@@ -118,9 +118,9 @@ func loadRouter() {
 
 	http.HandleFunc("/about.html", func(w http.ResponseWriter, r *http.Request) {
 		loader.Logger.Infof("Request for /about.html from %s", r.RemoteAddr)
-		t := template.New("about.html").Funcs(funcMap)
+		t := template.New("post.html").Funcs(funcMap)
 		t, err := t.ParseFiles(
-			loadedConfig.Basic.RootPath+"/template/page/about.html",
+			loadedConfig.Basic.RootPath+"/template/page/post.html",
 			loadedConfig.Basic.RootPath+"/template/layout/footer.html",
 			loadedConfig.Basic.RootPath+"/template/layout/sidebar.html",
 			loadedConfig.Basic.RootPath+"/template/layout/article.html",
@@ -308,7 +308,7 @@ func loadArchives() {
 							Time string
 						}{
 							Name: article.Title,
-							Url:  fmt.Sprintf("posts/%s.html", article.DirName),
+							Url:  fmt.Sprintf("posts/%s", article.DirName),
 							Time: article.CreateDate,
 						})
 					}
@@ -326,10 +326,10 @@ func loadArchives() {
 		http.NotFound(w, r)
 	})
 
-	archivesMux.HandleFunc("/archives/collections/", func(w http.ResponseWriter, r *http.Request) {
-		loader.Logger.Infof("Request for %s from %s", r.URL.Path, r.RemoteAddr)
-		w.Write(fmt.Appendf(nil, "Request for %s from %s", r.URL.Path, r.RemoteAddr))
-	})
+	// archivesMux.HandleFunc("/archives/collections/", func(w http.ResponseWriter, r *http.Request) {
+	// 	loader.Logger.Infof("Request for %s from %s", r.URL.Path, r.RemoteAddr)
+	// 	w.Write(fmt.Appendf(nil, "Request for %s from %s", r.URL.Path, r.RemoteAddr))
+	// })
 
 	archivesMux.HandleFunc("/archives/", func(w http.ResponseWriter, r *http.Request) {
 		loader.Logger.Infof("Request for /archives from %s", r.RemoteAddr)
@@ -353,15 +353,15 @@ func loadArchives() {
 				Id   int
 				Time string
 			}
-			Collections []struct {
+			Tags []struct {
 				Name string
 				Id   int
 			}
 		}{
-			Config:      loadedConfig,
-			Icons:       iconMap,
-			Categories:  sqlite_db.GetCategoryList(),
-			Collections: nil,
+			Config:     loadedConfig,
+			Icons:      iconMap,
+			Categories: sqlite_db.GetCategoryList(),
+			Tags:       sqlite_db.GetTagList(),
 		})
 		if err != nil {
 			http.Error(w, "Failed to execute template", http.StatusInternalServerError)
@@ -449,7 +449,41 @@ func loadPosts() {
 		parts := strings.Split(suffix, "/")
 		if len(parts) > 1 {
 
-			// articleDirName := parts[1]
+			articleDirName := parts[1]
+			loader.Logger.Infof("Requested article dir name: %s", articleDirName)
+			article, err := sqlite_db.GetArticleMetaByDir(articleDirName)
+			if err != nil {
+				http.Error(w, "Failed to get article", http.StatusInternalServerError)
+				loader.Logger.Error("Failed to get article:", err)
+				return
+			}
+			t := template.New("post.html").Funcs(funcMap)
+			t, err = t.ParseFiles(
+				loadedConfig.Basic.RootPath+"/template/page/post.html",
+				loadedConfig.Basic.RootPath+"/template/layout/footer.html",
+				loadedConfig.Basic.RootPath+"/template/layout/sidebar.html",
+				loadedConfig.Basic.RootPath+"/template/layout/article.html",
+			)
+			if err != nil {
+				http.Error(w, "Failed to parse template", http.StatusInternalServerError)
+				loader.Logger.Error(err)
+				return
+			}
+			loader.Logger.Info("Loading template successfully")
+			err = t.Execute(w, struct {
+				Config  config.Config
+				Icons   map[string]string
+				Article sqlite_db.ArticleMeta
+			}{
+				Config:  loadedConfig,
+				Icons:   iconMap,
+				Article: *article,
+			})
+			if err != nil {
+				http.Error(w, "Failed to execute template", http.StatusInternalServerError)
+				loader.Logger.Error(err)
+				return
+			}
 
 			return
 		}
