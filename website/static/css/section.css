@@ -1,24 +1,17 @@
-/* 主内容区调整 */
-.main.full-width {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 40px 20px;
-}
-
 /* 分类标题 */
 .section-tilte {
     color: #2d3748;
     font-size: 1.5rem;
-    margin-bottom: 2rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    margin: 2rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #cbd5e0;
 }
 
 /* 分类卡片容器 */
 .section-card {
     background: white;
     border-radius: 8px;
-    padding: 2rem;
+    padding: 1rem 0 1rem 2rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     margin-bottom: 3rem;
 }
@@ -45,18 +38,34 @@
 /* 紧凑文章列表 */
 .article-list--compact {
     display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 1.5rem;
+    margin-top: 1rem;
 }
 
 .article-list--compact article {
     border-bottom: 1px solid #e2e8f0;
-    padding-bottom: 1.5rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+    border-bottom: none; /* 移除原有边框 */
+}
+
+.article-list--compact article:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .article-list--compact article:last-child {
     border-bottom: none;
 }
 
+.article-list--compact article a {
+    text-decoration: none;
+    padding: 2rem;
+    display: block
+}
 /* 文章详情 */
 .article-details {
     display: grid;
@@ -67,7 +76,7 @@
     color: #2d3748;
     font-size: 1.25rem;
     margin: 0;
-    transition: color 0.2s ease;
+    text-decoration: none;
 }
 
 .article-title:hover {
