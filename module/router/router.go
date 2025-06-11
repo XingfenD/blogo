@@ -10,22 +10,15 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
-	"text/template"
 	"time"
 
 	"github.com/XingfenD/blogo/module/config"
 	"github.com/XingfenD/blogo/module/loader"
 	sqlite_db "github.com/XingfenD/blogo/module/sqlite"
+	"github.com/XingfenD/blogo/module/tpl"
 )
 
 var loadedConfig config.Config
-
-var funcMap = template.FuncMap{
-	"date": func(format string) string {
-		return time.Now().Format(format)
-	},
-}
-
 var iconMap map[string]string
 
 // StartServer 初始化并启动 HTTP 服务器
@@ -90,20 +83,7 @@ func loadRouter() {
 		var err error
 		loader.Logger.Infof("Request for /homepage.html from %s", r.RemoteAddr)
 
-		t := template.New("index.html").Funcs(funcMap)
-
-		t, err = t.ParseFiles(
-			loadedConfig.Basic.RootPath+"/template/page/index.html",
-			loadedConfig.Basic.RootPath+"/template/layout/footer.html",
-			loadedConfig.Basic.RootPath+"/template/layout/sidebar.html",
-		)
-		if err != nil {
-			http.Error(w, "Failed to parse template", http.StatusInternalServerError)
-			loader.Logger.Error(err)
-			return
-		}
-		loader.Logger.Info("Loading template successfully")
-		err = t.Execute(w, struct {
+		err = tpl.IndexTpl.Execute(w, struct {
 			Config config.Config
 			Icons  map[string]string
 		}{
@@ -118,19 +98,7 @@ func loadRouter() {
 
 	http.HandleFunc("/about.html", func(w http.ResponseWriter, r *http.Request) {
 		loader.Logger.Infof("Request for /about.html from %s", r.RemoteAddr)
-		t := template.New("post.html").Funcs(funcMap)
-		t, err := t.ParseFiles(
-			loadedConfig.Basic.RootPath+"/template/page/post.html",
-			loadedConfig.Basic.RootPath+"/template/layout/footer.html",
-			loadedConfig.Basic.RootPath+"/template/layout/sidebar.html",
-			loadedConfig.Basic.RootPath+"/template/layout/article.html",
-		)
-		if err != nil {
-			http.Error(w, "Failed to parse template", http.StatusInternalServerError)
-			loader.Logger.Error(err)
-			return
-		}
-		loader.Logger.Info("Loading template successfully")
+
 		aboutMeta, err := sqlite_db.GetAboutMeta()
 		// loader.Logger.Info(aboutMeta)
 		if err != nil {
@@ -138,7 +106,7 @@ func loadRouter() {
 			loader.Logger.Error(err)
 			return
 		}
-		err = t.Execute(w, struct {
+		err = tpl.PostTpl.Execute(w, struct {
 			Config  config.Config
 			Icons   map[string]string
 			Article sqlite_db.ArticleMeta
@@ -181,19 +149,9 @@ func loadArchives() {
 		// 处理空路径的情况（当访问 /archives/categories/ 时）
 		if suffix == "" {
 			loader.Logger.Infof("Request for /archives/categories/ from %s", r.RemoteAddr)
-			t := template.New("section.html").Funcs(funcMap)
-			t, err := t.ParseFiles(
-				loadedConfig.Basic.RootPath+"/template/page/section.html",
-				loadedConfig.Basic.RootPath+"/template/layout/footer.html",
-				loadedConfig.Basic.RootPath+"/template/layout/sidebar.html",
-			)
-			if err != nil {
-				http.Error(w, "Failed to parse template", http.StatusInternalServerError)
-				loader.Logger.Error(err)
-				return
-			}
+
 			loader.Logger.Info("Loading template successfully")
-			err = t.Execute(w, struct {
+			err := tpl.SectionTpl.Execute(w, struct {
 				Config       config.Config
 				Icons        map[string]string
 				SectionTitle string
@@ -260,21 +218,10 @@ func loadArchives() {
 				loader.Logger.Error("Failed to get category name:", err)
 				return
 			}
-			t := template.New("section.html").Funcs(funcMap)
-			t, err = t.ParseFiles(
-				loadedConfig.Basic.RootPath+"/template/page/section.html",
-				loadedConfig.Basic.RootPath+"/template/layout/footer.html",
-				loadedConfig.Basic.RootPath+"/template/layout/sidebar.html",
-			)
-			if err != nil {
-				http.Error(w, "Failed to parse template", http.StatusInternalServerError)
-				loader.Logger.Error(err)
-				return
-			}
 			loader.Logger.Info("Loading template successfully")
 			Articles := sqlite_db.GetArticlesByCategory(catID)
 
-			err = t.Execute(w, struct {
+			err = tpl.SectionTpl.Execute(w, struct {
 				Config       config.Config
 				Icons        map[string]string
 				SectionTitle string
@@ -333,19 +280,7 @@ func loadArchives() {
 
 	archivesMux.HandleFunc("/archives/", func(w http.ResponseWriter, r *http.Request) {
 		loader.Logger.Infof("Request for /archives from %s", r.RemoteAddr)
-		t := template.New("archives.html").Funcs(funcMap)
-		t, err := t.ParseFiles(
-			loadedConfig.Basic.RootPath+"/template/page/archives.html",
-			loadedConfig.Basic.RootPath+"/template/layout/footer.html",
-			loadedConfig.Basic.RootPath+"/template/layout/sidebar.html",
-		)
-		if err != nil {
-			http.Error(w, "Failed to parse template", http.StatusInternalServerError)
-			loader.Logger.Error(err)
-			return
-		}
-		loader.Logger.Info("Loading template successfully")
-		err = t.Execute(w, struct {
+		err := tpl.ArchiveTpl.Execute(w, struct {
 			Config     config.Config
 			Icons      map[string]string
 			Categories []struct {
@@ -382,20 +317,8 @@ func loadPosts() {
 		)
 		if suffix == "" {
 			loader.Logger.Infof("Request for /posts/ from %s", r.RemoteAddr)
-			t := template.New("section.html").Funcs(funcMap)
-			t, err := t.ParseFiles(
-				loadedConfig.Basic.RootPath+"/template/page/section.html",
-				loadedConfig.Basic.RootPath+"/template/layout/footer.html",
-				loadedConfig.Basic.RootPath+"/template/layout/sidebar.html",
-			)
-			if err != nil {
-				http.Error(w, "Failed to parse template", http.StatusInternalServerError)
-				loader.Logger.Error(err)
-				return
-			}
-			loader.Logger.Info("Loading template successfully")
 			posts := sqlite_db.GetArticleList()
-			err = t.Execute(w, struct {
+			err := tpl.PostTpl.Execute(w, struct {
 				Config       config.Config
 				Icons        map[string]string
 				SectionTitle string
@@ -457,20 +380,7 @@ func loadPosts() {
 				loader.Logger.Error("Failed to get article:", err)
 				return
 			}
-			t := template.New("post.html").Funcs(funcMap)
-			t, err = t.ParseFiles(
-				loadedConfig.Basic.RootPath+"/template/page/post.html",
-				loadedConfig.Basic.RootPath+"/template/layout/footer.html",
-				loadedConfig.Basic.RootPath+"/template/layout/sidebar.html",
-				loadedConfig.Basic.RootPath+"/template/layout/article.html",
-			)
-			if err != nil {
-				http.Error(w, "Failed to parse template", http.StatusInternalServerError)
-				loader.Logger.Error(err)
-				return
-			}
-			loader.Logger.Info("Loading template successfully")
-			err = t.Execute(w, struct {
+			err = tpl.PostTpl.Execute(w, struct {
 				Config  config.Config
 				Icons   map[string]string
 				Article sqlite_db.ArticleMeta
