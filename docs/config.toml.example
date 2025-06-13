@@ -1,0 +1,33 @@
+[basic]
+port2listen = 8080
+base_url = 'http://localhost:8080'
+log_level = 4
+root_path = '/Users/xingfend/Documents/Project/blogo/website'
+
+[user]
+title = 'Blogo'
+description = 'blogo, a simple blog engine by go'
+greeting = 'Hello world from blogo'
+name = 'Fendy'
+email = 'xingfen.fendy@outlook.com'
+home_url = 'https://github.com/XingfenD'
+avatar_url = 'https://xingfend.github.io/xingfen-star.github.io/img/avatar_hu_e75ba5eda9add5a4.png'
+
+[sidebar]
+emoji = '😉'
+home_icon = 'home'
+[[sidebar.social_links]]
+name = 'GitHub'
+url = 'https://github.com/XingfenD'
+icon = 'github'
+[[sidebar.social_links]]
+name = 'Bilibili'
+url = 'https://space.bilibili.com/473214036'
+icon = 'bilibili'
+
+[footer]
+custom_text = '星藏点雪，月隐晦明。'
+
+[archive]
+show_tags = true
+show_timeline = true

@@ -16,6 +16,7 @@ import (
 	"github.com/XingfenD/blogo/module/loader"
 	sqlite_db "github.com/XingfenD/blogo/module/sqlite"
 	"github.com/XingfenD/blogo/module/tpl"
+	"github.com/russross/blackfriday/v2"
 )
 
 var loadedConfig config.Config
@@ -413,6 +414,18 @@ func loadPosts() {
 				loader.Logger.Error("Failed to get article:", err)
 				return
 			}
+
+			/* parse the markdown to html */
+			markdown := article.Content
+			html := blackfriday.Run([]byte(markdown), blackfriday.WithExtensions(
+				0|blackfriday.AutoHeadingIDs|
+					blackfriday.FencedCode|
+					blackfriday.Tables|
+					blackfriday.Strikethrough|
+					blackfriday.DefinitionLists),
+			)
+			article.Content = string(html)
+
 			err = tpl.PostTpl.Execute(w, struct {
 				Config  config.Config
 				Icons   map[string]string
