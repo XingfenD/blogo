@@ -65,7 +65,6 @@
     color: #333;
 }
 
-/* 去除 site-name 链接下划线 */
 .site-name a {
     text-decoration: none;
     color: inherit;
@@ -79,9 +78,11 @@
 
 /* 社交链接列表样式 */
 .menu-social {
-    list-style-type: none;
+    /* list-style-type: none; */
+    display: flex;
     padding: 0;
     text-align: left;
+    margin: 0;
 }
 
 .menu-social li {
@@ -91,9 +92,27 @@
 
 .menu-social li a {
     font-size: 24px;
-    color: #007bff;
+    color: #777;
     text-decoration: none;
 }
+
+.menu-social li a:hover {
+    color: #333;
+}
+
+.menu-social li a svg {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+}
+
+.sidebar-divider {
+    width: 90%;
+    height: 2px;
+    background-color: #cbd5e0;
+    margin: 10px auto 0 auto;
+}
+
 
 /* 主菜单样式 */
 .menu {

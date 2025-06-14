@@ -22,9 +22,11 @@ type Config struct {
 		AvatarUrl   string `toml:"avatar_url"`
 	}
 	Sidebar struct {
-		Emoji       string `toml:"emoji"`
-		HomeIcon    string `toml:"home_icon"`
-		SocialLinks []struct {
+		Emoji             string `toml:"emoji"`
+		EnableDivider     bool   `toml:"enable_divider"`
+		HomeIcon          string `toml:"home_icon"`
+		EnableSocialLinks bool   `toml:"enable_social_links"`
+		SocialLinks       []struct {
 			Name string `toml:"name"`
 			Url  string `toml:"url"`
 			Icon string `toml:"icon"`

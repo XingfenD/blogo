@@ -7,7 +7,7 @@
             </a>
             <span class="emoji">{{.Config.Sidebar.Emoji}}</span>
         </figure>
-        <div class=""site-meta>
+        <div class="site-meta">
             <h1 class="site-name">
                 <a href="{{.Config.User.HomeUrl}}">
                     {{.Config.User.Name}}
@@ -16,6 +16,7 @@
             <h2 class="site-description">{{.Config.User.Description}}</h2>
         </div>
     </header>
+    {{if .Config.Sidebar.EnableSocialLinks}}
     <ol class="menu-social">
         {{range .Config.Sidebar.SocialLinks}}
         <li>
@@ -25,6 +26,12 @@
         </li>
         {{end}}
     </ol>
+    {{end}}
+
+    {{if .Config.Sidebar.EnableDivider}}
+    <div class="sidebar-divider"></div>
+    {{end}}
+
     <ol class="menu" id="main-menu">
         <li class="menu-item">
             <a href="{{.Config.Basic.BaseUrl}}">

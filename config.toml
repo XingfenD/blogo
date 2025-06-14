@@ -16,6 +16,8 @@ avatar_url = 'https://xingfend.github.io/xingfen-star.github.io/img/avatar_hu_e7
 [sidebar]
 emoji = '😉'
 home_icon = 'home'
+enable_divider = true
+enable_social_links = true
 [[sidebar.social_links]]
 name = 'GitHub'
 url = 'https://github.com/XingfenD'
