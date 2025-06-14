@@ -9,51 +9,52 @@
 <body>
     {{template "sidebar" .}}
     <main class="main full-width">
-    <header>
-        <h2 class="section-list">类别 - CATEGORIES</h2>
-        <div class="subsection-list">
-            <div class="collection-list--tile">
-                {{range .Categories}}
-                    <a href="{{$.Config.Basic.BaseUrl}}/archives/categories/{{.Id}}">
-                        <h2 class="collection-list--tile--title">{{.Name}}</h2>
-                    </a>
-                {{end}}
+        <header>
+            <h2 class="section-list">类别 - CATEGORIES</h2>
+            <div class="subsection-list">
+                <div class="collection-list--tile">
+                    {{range .Categories}}
+                        <a href="{{$.Config.Basic.BaseUrl}}/archives/categories/{{.Id}}">
+                            <h2 class="collection-list--tile--title">{{.Name}}</h2>
+                        </a>
+                    {{end}}
+                </div>
             </div>
-        </div>
-        {{if .Config.Archive.ShowTags}}
-        <h2 class="section-list">标签 - TAGS</h2>
-        <div class="subsection-list">
-            <div class="collection-list--tile">
-                {{range .Tags}}
-                    <a href="{{$.Config.Basic.BaseUrl}}/archives/tags/{{.Id}}">
-                        <h2 class="collection-list--tile--title">{{.Name}}</h2>
-                    </a>
-                {{end}}
-            </div>
-        </div>
-        {{end}}
-        {{if .Config.Archive.ShowTimeline}}
-        <h2 class="section-list">时间线 - TIMELINE</h2>
-        <div class="subsection-list">
-            {{$years := .ArticlesOrderByYear}}
-            {{range $year := sortByYearDesc (keys $years)}}
-            <div class="year-group">
-                <h3>{{$year}}</h3>
-                <div class="article-list">
-                    {{range getMapValue $years $year}}
-                    <article class="article-list--tile">
-                    <a href="{{$.Config.Basic.BaseUrl}}/posts/{{.DirName}}">
-                        <h2 class="article-list--tile--title">{{.Title}}</h2>
-                        <time>{{.Time}}</time>
-                    </a>
-                    </article>
+            {{if .Config.Archive.ShowTags}}
+            <h2 class="section-list">标签 - TAGS</h2>
+            <div class="subsection-list">
+                <div class="collection-list--tile">
+                    {{range .Tags}}
+                        <a href="{{$.Config.Basic.BaseUrl}}/archives/tags/{{.Id}}">
+                            <h2 class="collection-list--tile--title">{{.Name}}</h2>
+                        </a>
                     {{end}}
                 </div>
             </div>
             {{end}}
-        </div>
-        {{end}}
-    </header>
-    {{template "footer" .}}
+            {{if .Config.Archive.ShowTimeline}}
+            <h2 class="section-list">时间线 - TIMELINE</h2>
+            <div class="subsection-list">
+                {{$years := .ArticlesOrderByYear}}
+                {{range $year := sortByYearDesc (keys $years)}}
+                <div class="year-group">
+                    <h3>{{$year}}</h3>
+                    <div class="article-list">
+                        {{range getMapValue $years $year}}
+                        <article class="article-list--tile">
+                        <a href="{{$.Config.Basic.BaseUrl}}/posts/{{.DirName}}">
+                            <h2 class="article-list--tile--title">{{.Title}}</h2>
+                            <time>{{.Time}}</time>
+                        </a>
+                        </article>
+                        {{end}}
+                    </div>
+                </div>
+                {{end}}
+            </div>
+            {{end}}
+        </header>
+        {{template "footer" .}}
     </main>
 </body>
+</html>

@@ -12,6 +12,7 @@ import (
 func loadArchives() {
 	http.HandleFunc("/archives/", func(w http.ResponseWriter, r *http.Request) {
 		loader.Logger.Infof("Request for /archives from %s", r.RemoteAddr)
+
 		err := tpl.ArchiveTpl.Execute(w, struct {
 			Config     config.Config
 			Icons      map[string]string

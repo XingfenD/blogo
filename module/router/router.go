@@ -57,16 +57,17 @@ func loadRouter() {
 	loadArchives()
 	loadAbout()
 	loadPosts()
+	loadNotFound()
 	loadRoot()
 
 }
 
 func loadStatic() {
 	http.Handle("/static/", http.StripPrefix("/static/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		loader.Logger.Infof("Request for %s from %s", r.URL.Path, r.RemoteAddr)
+		loader.Logger.Infof("Request for /%s from %s", r.URL.Path, r.RemoteAddr)
 		fs := http.Dir(loadedConfig.Basic.RootPath + "/static")
 		path := r.URL.Path
-		loader.Logger.Infof("Opening file %s", path)
+		loader.Logger.Infof("Opening file /%s", path)
 		file, err := fs.Open(path)
 		if err != nil {
 			http.NotFound(w, r)
@@ -87,9 +88,10 @@ func loadStatic() {
 
 func loadRoot() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		loader.Logger.Infof("Request for %s from %s", r.URL.Path, r.RemoteAddr)
+		loader.Logger.Infof("RootRouter: Request for %s from %s", r.URL.Path, r.RemoteAddr)
+
 		if r.URL.Path == "/" {
-			http.Redirect(w, r, "/homepage.html", http.StatusFound)
+			http.Redirect(w, r, "/homepage/", http.StatusFound)
 		} else {
 			http.NotFound(w, r)
 		}

@@ -10,8 +10,8 @@ import (
 )
 
 func loadAbout() {
-	http.HandleFunc("/about.html", func(w http.ResponseWriter, r *http.Request) {
-		loader.Logger.Infof("Request for /about.html from %s", r.RemoteAddr)
+	http.HandleFunc("/about/", func(w http.ResponseWriter, r *http.Request) {
+		loader.Logger.Infof("Request for /about/ from %s", r.RemoteAddr)
 
 		aboutMeta, err := sqlite_db.GetAboutMeta()
 		// loader.Logger.Info(aboutMeta)
@@ -20,6 +20,7 @@ func loadAbout() {
 			loader.Logger.Error(err)
 			return
 		}
+
 		err = tpl.PostTpl.Execute(w, struct {
 			Config  config.Config
 			Icons   map[string]string

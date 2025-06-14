@@ -14,6 +14,7 @@ var IndexTpl *template.Template
 var PostTpl *template.Template
 var SectionTpl *template.Template
 var ArchiveTpl *template.Template
+var NotFoundTpl *template.Template
 
 var rootPath string
 
@@ -74,6 +75,7 @@ func LoadTemplate(root_path string) {
 	loadPostTpl()
 	loadSectionTpl()
 	loadArchiveTpl()
+	load404Tpl()
 
 	loader.Logger.Info("load template success")
 }
@@ -87,7 +89,7 @@ func loadPostTpl() {
 		rootPath+"/template/layout/sidebar.html",
 		rootPath+"/template/layout/article.html",
 	)
-	if err != nil {
+	if err != nil || PostTpl == nil {
 		loader.Logger.Error("load post template failed", err)
 	} else {
 		loader.Logger.Info("load post template success")
@@ -103,7 +105,7 @@ func loadSectionTpl() {
 		rootPath+"/template/layout/footer.html",
 		rootPath+"/template/layout/sidebar.html",
 	)
-	if err != nil {
+	if err != nil || SectionTpl == nil {
 		loader.Logger.Error("load section template failed", err)
 	} else {
 		loader.Logger.Info("load section template success")
@@ -118,7 +120,7 @@ func loadArchiveTpl() {
 		rootPath+"/template/layout/footer.html",
 		rootPath+"/template/layout/sidebar.html",
 	)
-	if err != nil {
+	if err != nil || ArchiveTpl == nil {
 		loader.Logger.Error("load archive template failed", err)
 	} else {
 		loader.Logger.Info("load archive template success")
@@ -133,9 +135,24 @@ func loadIndexTpl() {
 		rootPath+"/template/layout/footer.html",
 		rootPath+"/template/layout/sidebar.html",
 	)
-	if err != nil {
+	if err != nil || IndexTpl == nil {
 		loader.Logger.Error("load index template failed", err)
 	} else {
 		loader.Logger.Info("load index template success")
+	}
+}
+
+func load404Tpl() {
+	var err error
+	NotFoundTpl = template.New("404.html").Funcs(funcMap)
+	NotFoundTpl, err = NotFoundTpl.ParseFiles(
+		rootPath+"/template/page/404.html",
+		rootPath+"/template/layout/footer.html",
+		rootPath+"/template/layout/sidebar.html",
+	)
+	if err != nil || NotFoundTpl == nil {
+		loader.Logger.Error("load 404 template failed", err)
+	} else {
+		loader.Logger.Info("load 404 template success")
 	}
 }

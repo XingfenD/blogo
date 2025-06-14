@@ -24,7 +24,8 @@ func loadPosts() {
 		if suffix == "" {
 			loader.Logger.Infof("Request for /posts/ from %s", r.RemoteAddr)
 			posts := sqlite_db.GetArticleList()
-			err := tpl.PostTpl.Execute(w, struct {
+
+			err := tpl.SectionTpl.Execute(w, struct {
 				Config       config.Config
 				Icons        map[string]string
 				SectionTitle string
@@ -81,6 +82,7 @@ func loadPosts() {
 			articleDirName := parts[1]
 			loader.Logger.Infof("Requested article dir name: %s", articleDirName)
 			article, err := sqlite_db.GetArticleMetaByDir(articleDirName)
+
 			if err != nil {
 				http.Error(w, "Failed to get article", http.StatusInternalServerError)
 				loader.Logger.Error("Failed to get article:", err)

@@ -9,9 +9,9 @@ import (
 )
 
 func loadHomepage() {
-	http.HandleFunc("/homepage.html", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/homepage/", func(w http.ResponseWriter, r *http.Request) {
 		var err error
-		loader.Logger.Infof("Request for /homepage.html from %s", r.RemoteAddr)
+		loader.Logger.Infof("Request for /homepage/ from %s", r.RemoteAddr)
 
 		err = tpl.IndexTpl.Execute(w, struct {
 			Config config.Config
