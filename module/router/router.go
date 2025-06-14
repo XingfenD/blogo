@@ -93,7 +93,7 @@ func loadRoot() {
 		if r.URL.Path == "/" {
 			http.Redirect(w, r, "/homepage/", http.StatusFound)
 		} else {
-			http.NotFound(w, r)
+			http.Redirect(w, r, "/404", http.StatusFound)
 		}
 	})
 }

@@ -84,13 +84,13 @@ func loadCategories() {
 			loader.Logger.Infof("Requested category ID: %s", categoryID)
 			catID, err := strconv.Atoi(categoryID)
 			if err != nil {
-				http.Error(w, "Invalid category ID", http.StatusBadRequest)
+				http.Redirect(w, r, "/404", http.StatusFound)
 				loader.Logger.Error("Invalid category ID:", err)
 				return
 			}
 			sectionName, err := sqlite_db.GetCateById(catID)
 			if err != nil {
-				http.Error(w, "Failed to get category name", http.StatusInternalServerError)
+				http.Redirect(w, r, "/404", http.StatusFound)
 				loader.Logger.Error("Failed to get category name:", err)
 				return
 			}

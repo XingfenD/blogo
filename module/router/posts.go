@@ -75,6 +75,7 @@ func loadPosts() {
 
 			return
 		}
+
 		loader.Logger.Infof("Post path: %s (From %s)", suffix, r.RemoteAddr)
 		parts := strings.Split(suffix, "/")
 		if len(parts) > 1 {
@@ -84,7 +85,7 @@ func loadPosts() {
 			article, err := sqlite_db.GetArticleMetaByDir(articleDirName)
 
 			if err != nil {
-				http.Error(w, "Failed to get article", http.StatusInternalServerError)
+				http.Redirect(w, r, "/404", http.StatusFound)
 				loader.Logger.Error("Failed to get article:", err)
 				return
 			}
