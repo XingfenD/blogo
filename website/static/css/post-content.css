@@ -31,7 +31,6 @@
 .article-content code {
     font-family: 'Fira Code', monospace;
     font-size: 0.9rem;
-    background-color: rgba(135, 131, 120, 0.15);
     border-radius: 3px;
     padding: 0.2em 0.4em;
 }

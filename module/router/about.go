@@ -7,6 +7,7 @@ import (
 	"github.com/XingfenD/blogo/module/loader"
 	sqlite_db "github.com/XingfenD/blogo/module/sqlite"
 	"github.com/XingfenD/blogo/module/tpl"
+	"github.com/russross/blackfriday/v2"
 )
 
 func loadAbout() {
@@ -20,6 +21,17 @@ func loadAbout() {
 			loader.Logger.Error(err)
 			return
 		}
+
+		/* parse the markdown to html */
+		markdown := aboutMeta.Content
+		html := blackfriday.Run([]byte(markdown), blackfriday.WithExtensions(
+			0|blackfriday.AutoHeadingIDs|
+				blackfriday.FencedCode|
+				blackfriday.Tables|
+				blackfriday.Strikethrough|
+				blackfriday.DefinitionLists),
+		)
+		aboutMeta.Content = string(html)
 
 		err = tpl.PostTpl.Execute(w, struct {
 			Config  config.Config

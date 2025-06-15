@@ -23,22 +23,30 @@ func loadTags() {
 		if suffix == "" {
 			loader.Logger.Infof("Request for /archives/tags/ from %s", r.RemoteAddr)
 			err := tpl.SectionTpl.Execute(w, struct {
-				Config       config.Config
-				Icons        map[string]string
-				SectionTitle string
-				SectionName  string
-				SectionCount int
-				Terms        []struct {
+				Config      config.Config
+				Icons       map[string]string
+				SectionMeta struct {
+					SectionTitle string
+					SectionName  string
+					SectionCount int
+				}
+				Terms []struct {
 					Name string
 					Url  string
 					Time string
 				}
 			}{
-				Config:       loadedConfig,
-				Icons:        iconMap,
-				SectionTitle: "SECTION",
-				SectionName:  "tags",
-				SectionCount: len(sqlite_db.GetTagList()),
+				Config: loadedConfig,
+				Icons:  iconMap,
+				SectionMeta: struct {
+					SectionTitle string
+					SectionName  string
+					SectionCount int
+				}{
+					SectionTitle: "TAGS",
+					SectionName:  "tags",
+					SectionCount: len(sqlite_db.GetTagList()),
+				},
 				Terms: func() []struct {
 					Name string
 					Url  string
