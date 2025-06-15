@@ -53,22 +53,30 @@ func loadCategories() {
 func cateHandler(w http.ResponseWriter, r *http.Request) {
 	loader.Logger.Infof("Request for /archives/categories/ from %s", r.RemoteAddr)
 	err := tpl.SectionTpl.Execute(w, struct {
-		Config       config.Config
-		Icons        map[string]string
-		SectionTitle string
-		SectionName  string
-		SectionCount int
-		Terms        []struct {
+		Config      config.Config
+		Icons       map[string]string
+		SectionMeta struct {
+			SectionTitle string
+			SectionName  string
+			SectionCount int
+		}
+		Terms []struct {
 			Name string
 			Url  string
 			Time string
 		}
 	}{
-		Config:       loadedConfig,
-		Icons:        iconMap,
-		SectionTitle: "SECTION",
-		SectionName:  "categories",
-		SectionCount: len(sqlite_db.GetCategoryList()),
+		Config: loadedConfig,
+		Icons:  iconMap,
+		SectionMeta: struct {
+			SectionTitle string
+			SectionName  string
+			SectionCount int
+		}{
+			SectionTitle: "SECTION",
+			SectionName:  "categories",
+			SectionCount: len(sqlite_db.GetCategoryList()),
+		},
 		Terms: func() []struct {
 			Name string
 			Url  string

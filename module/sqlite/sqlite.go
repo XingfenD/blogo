@@ -126,6 +126,18 @@ type ArticleMeta struct {
 	Content     string
 }
 
+type ArticleListItem struct {
+	BlogId       int
+	DirName      string
+	Title        string
+	CreateDate   string
+	LastModified string
+	Year         string
+	Tags         []string
+	Description  string
+	Content      string
+}
+
 func GetAboutMeta() (*ArticleMeta, error) {
 	// 查询基础文章信息
 	row := db.QueryRow(`
@@ -370,26 +382,8 @@ func GetTagById(tagId int) (string, error) {
 	return tagName, nil
 }
 
-func GetArticlesByCategory(cateId int) []struct {
-	BlogId       int
-	DirName      string
-	Title        string
-	CreateDate   string
-	LastModified string
-	Tags         []string
-	Description  string
-	Content      string
-} {
-	var articles []struct {
-		BlogId       int
-		DirName      string
-		Title        string
-		CreateDate   string
-		LastModified string
-		Tags         []string
-		Description  string
-		Content      string
-	}
+func GetArticlesByCategory(cateId int) []ArticleListItem {
+	var articles []ArticleListItem
 
 	// 查询基础文章信息
 
@@ -406,16 +400,7 @@ func GetArticlesByCategory(cateId int) []struct {
 	defer rows.Close()
 
 	for rows.Next() {
-		var article struct {
-			BlogId       int
-			DirName      string
-			Title        string
-			CreateDate   string
-			LastModified string
-			Tags         []string
-			Description  string
-			Content      string
-		}
+		var article ArticleListItem
 
 		err := rows.Scan(
 			&article.Title,
@@ -451,18 +436,9 @@ func GetArticlesByCategory(cateId int) []struct {
 		tagRows.Close()
 
 		// 修改返回结构
-		articles = append(articles, struct {
-			BlogId       int
-			DirName      string
-			Title        string
-			CreateDate   string
-			LastModified string
-			Tags         []string
-			Description  string
-			Content      string
-		}{
+		articles = append(articles, ArticleListItem{
 			BlogId:       article.BlogId,
-			DirName:      article.DirName, // 新增字段赋值
+			DirName:      article.DirName,
 			Title:        article.Title,
 			CreateDate:   article.CreateDate,
 			LastModified: article.LastModified,
@@ -479,26 +455,8 @@ func GetArticlesByCategory(cateId int) []struct {
 	return articles
 }
 
-func GetArticlesByTag(tagId int) []struct {
-	BlogId       int
-	DirName      string
-	Title        string
-	CreateDate   string
-	LastModified string
-	Tags         []string
-	Description  string
-	Content      string
-} {
-	var articles []struct {
-		BlogId       int
-		DirName      string
-		Title        string
-		CreateDate   string
-		LastModified string
-		Tags         []string
-		Description  string
-		Content      string
-	}
+func GetArticlesByTag(tagId int) []ArticleListItem {
+	var articles []ArticleListItem
 
 	// 查询基础文章信息
 	rows, err := db.Query(`
@@ -515,16 +473,7 @@ func GetArticlesByTag(tagId int) []struct {
 	defer rows.Close()
 
 	for rows.Next() {
-		var article struct {
-			BlogId       int
-			DirName      string
-			Title        string
-			CreateDate   string
-			LastModified string
-			Tags         []string
-			Description  string
-			Content      string
-		}
+		var article ArticleListItem
 
 		err := rows.Scan(
 			&article.Title,
@@ -569,28 +518,8 @@ func GetArticlesByTag(tagId int) []struct {
 	return articles
 }
 
-func GetArticleList() []struct {
-	BlogId       int
-	DirName      string
-	Title        string
-	CreateDate   string
-	LastModified string
-	Year         string // 新增年份字段
-	Tags         []string
-	Description  string
-	Content      string
-} {
-	var articles []struct {
-		BlogId       int
-		DirName      string
-		Title        string
-		CreateDate   string
-		LastModified string
-		Year         string
-		Tags         []string
-		Description  string
-		Content      string
-	}
+func GetArticleList() []ArticleListItem {
+	var articles []ArticleListItem
 
 	// 修改查询语句添加年份字段和排序规则
 	rows, err := db.Query(`
@@ -634,7 +563,7 @@ func GetArticleList() []struct {
 			&article.DirName,
 			&article.Year, // 扫描新增的年份字段
 		)
-		// ... 保持后续标签查询逻辑不变 ...
+
 		if err != nil {
 			loader.Logger.Error("Error scanning article row:", err)
 			continue
