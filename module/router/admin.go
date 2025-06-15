@@ -140,11 +140,11 @@ func handleAdminRender(w http.ResponseWriter, r *http.Request) {
 		TotalTags       int
 	}{
 		TotalPosts:      len(sqlite_db.GetArticleList()),
-		TotalCategories: len(sqlite_db.GetCategoryList()),
-		TotalTags:       len(sqlite_db.GetTagList()),
+		TotalCategories: len(sqlite_db.GetCategoryList(false)),
+		TotalTags:       len(sqlite_db.GetTagList(false)),
 	}
 
-	recentPosts := sqlite_db.GetRecentArticles(5) // 需要实现该函数
+	recentPosts := sqlite_db.GetRecentArticles(5)
 
 	err := tpl.AdminTpl.Execute(w, struct {
 		Config        config.Config
@@ -167,5 +167,23 @@ func handleAdminRender(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Failed to execute admin template", http.StatusInternalServerError)
 		loader.Logger.Error("Admin template execution failed:", err)
+	}
+}
+
+func handleCollePage(w http.ResponseWriter, r *http.Request) {
+	err := tpl.ColleTpl.Execute(w, struct {
+		Config         config.Config
+		Icons          map[string]string
+		ColleTableMeta struct {
+			Title          string
+			CollectionList []sqlite_db.CollectionListItem
+		}
+	}{
+		Config: loadedConfig,
+		Icons:  iconMap,
+	})
+	if err != nil {
+		http.Error(w, "Failed to execute collection template", http.StatusInternalServerError)
+		loader.Logger.Error("Collection template execution failed:", err)
 	}
 }

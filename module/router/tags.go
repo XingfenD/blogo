@@ -37,53 +37,29 @@ func loadTags() {
 }
 
 func tagHandler(w http.ResponseWriter) {
+	tags := sqlite_db.GetTagList(false)
 	err := tpl.SectionTpl.Execute(w, struct {
 		Config      config.Config
 		Icons       map[string]string
-		SectionMeta struct {
-			SectionTitle string
-			SectionName  string
-			SectionCount int
-		}
-		Terms []struct {
-			Name string
-			Url  string
-			Time string
-		}
+		SectionMeta sectionMeta
 	}{
 		Config: loadedConfig,
 		Icons:  iconMap,
-		SectionMeta: struct {
-			SectionTitle string
-			SectionName  string
-			SectionCount int
-		}{
+		SectionMeta: sectionMeta{
 			SectionTitle: "TAGS",
 			SectionName:  "tags",
-			SectionCount: len(sqlite_db.GetTagList()),
+			SectionCount: len(tags),
+			SectionTerms: func() []Terms {
+				var terms []Terms
+				for _, tag := range tags {
+					terms = append(terms, Terms{
+						Name: tag.ColleName,
+						Url:  fmt.Sprintf("archives/tags/%d", tag.ColleId),
+					})
+				}
+				return terms
+			}(),
 		},
-		Terms: func() []struct {
-			Name string
-			Url  string
-			Time string
-		} {
-			var terms []struct {
-				Name string
-				Url  string
-				Time string
-			}
-			for _, tag := range sqlite_db.GetTagList() {
-				terms = append(terms, struct {
-					Name string
-					Url  string
-					Time string
-				}{
-					Name: tag.Name,
-					Url:  fmt.Sprintf("archives/tags/%d", tag.Id),
-				})
-			}
-			return terms
-		}(),
 	})
 	if err != nil {
 		http.Error(w, "Failed to execute template", http.StatusInternalServerError)
@@ -109,12 +85,8 @@ func tagDetailHandler(tagID string, w http.ResponseWriter) {
 	err = tpl.SectionTpl.Execute(w, struct {
 		Config      config.Config
 		Icons       map[string]string
-		SectionMeta struct {
-			SectionTitle string
-			SectionName  string
-			SectionCount int
-		}
-		Terms []struct {
+		SectionMeta sectionMeta
+		Terms       []struct {
 			Name string
 			Url  string
 			Time string
@@ -122,16 +94,12 @@ func tagDetailHandler(tagID string, w http.ResponseWriter) {
 	}{
 		Config: loadedConfig,
 		Icons:  iconMap,
-		SectionMeta: struct {
-			SectionTitle string
-			SectionName  string
-			SectionCount int
-		}{
+		SectionMeta: sectionMeta{
 			SectionTitle: "TAGS",
 			SectionName:  sectionName,
 			SectionCount: len(Articles),
+			SectionTerms: createTagTerms(Articles),
 		},
-		Terms: createTagTerms(Articles),
 	})
 	if err != nil {
 		http.Error(w, "Failed to execute template", http.StatusInternalServerError)
@@ -140,22 +108,10 @@ func tagDetailHandler(tagID string, w http.ResponseWriter) {
 	}
 }
 
-func createTagTerms(Articles []sqlite_db.ArticleListItem) []struct {
-	Name string
-	Url  string
-	Time string
-} {
-	var terms []struct {
-		Name string
-		Url  string
-		Time string
-	}
+func createTagTerms(Articles []sqlite_db.ArticleListItem) []Terms {
+	var terms []Terms
 	for _, article := range Articles {
-		terms = append(terms, struct {
-			Name string
-			Url  string
-			Time string
-		}{
+		terms = append(terms, Terms{
 			Name: article.Title,
 			Url:  fmt.Sprintf("posts/%s", article.DirName),
 			Time: article.CreateDate,

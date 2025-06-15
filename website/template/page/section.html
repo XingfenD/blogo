@@ -19,7 +19,7 @@
             </div>
         </header>
         <section class="article-list--compact">
-            {{range .Terms}}
+            {{range .SectionMeta.SectionTerms}}
             <article>
                 <a href="{{$.Config.Basic.BaseUrl}}/{{.Url}}">
                     <div class="article-details">

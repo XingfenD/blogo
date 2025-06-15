@@ -52,54 +52,30 @@ func loadCategories() {
 
 func cateHandler(w http.ResponseWriter, r *http.Request) {
 	loader.Logger.Infof("Request for /archives/categories/ from %s", r.RemoteAddr)
+	categories := sqlite_db.GetCategoryList(false)
+
 	err := tpl.SectionTpl.Execute(w, struct {
 		Config      config.Config
 		Icons       map[string]string
-		SectionMeta struct {
-			SectionTitle string
-			SectionName  string
-			SectionCount int
-		}
-		Terms []struct {
-			Name string
-			Url  string
-			Time string
-		}
+		SectionMeta sectionMeta
 	}{
 		Config: loadedConfig,
 		Icons:  iconMap,
-		SectionMeta: struct {
-			SectionTitle string
-			SectionName  string
-			SectionCount int
-		}{
+		SectionMeta: sectionMeta{
 			SectionTitle: "SECTION",
 			SectionName:  "categories",
-			SectionCount: len(sqlite_db.GetCategoryList()),
+			SectionCount: len(categories),
+			SectionTerms: func() []Terms {
+				var terms []Terms
+				for _, category := range categories {
+					terms = append(terms, Terms{
+						Name: category.ColleName,
+						Url:  fmt.Sprintf("archives/categories/%d", category.ColleId),
+					})
+				}
+				return terms
+			}(),
 		},
-		Terms: func() []struct {
-			Name string
-			Url  string
-			Time string
-		} {
-			var terms []struct {
-				Name string
-				Url  string
-				Time string
-			}
-			for _, category := range sqlite_db.GetCategoryList() {
-				terms = append(terms, struct {
-					Name string
-					Url  string
-					Time string
-				}{
-					Name: category.Name,
-					Url:  fmt.Sprintf("archives/categories/%d", category.Id),
-					Time: category.Time,
-				})
-			}
-			return terms
-		}(),
 	})
 	if err != nil {
 		http.Error(w, "Failed to execute template", http.StatusInternalServerError)
@@ -119,51 +95,26 @@ func cateDetailHandler(cateId int, w http.ResponseWriter, r *http.Request) {
 	err = tpl.SectionTpl.Execute(w, struct {
 		Config      config.Config
 		Icons       map[string]string
-		SectionMeta struct {
-			SectionTitle string
-			SectionName  string
-			SectionCount int
-		}
-		Terms []struct {
-			Name string
-			Url  string
-			Time string
-		}
+		SectionMeta sectionMeta
 	}{
 		Config: loadedConfig,
 		Icons:  iconMap,
-		SectionMeta: struct {
-			SectionTitle string
-			SectionName  string
-			SectionCount int
-		}{
+		SectionMeta: sectionMeta{
 			SectionTitle: "CATEGORIES",
 			SectionName:  sectionName,
 			SectionCount: len(Articles),
+			SectionTerms: func() []Terms {
+				var terms []Terms
+				for _, article := range Articles {
+					terms = append(terms, Terms{
+						Name: article.Title,
+						Url:  fmt.Sprintf("posts/%s", article.DirName),
+						Time: article.CreateDate,
+					})
+				}
+				return terms
+			}(),
 		},
-		Terms: func() []struct {
-			Name string
-			Url  string
-			Time string
-		} {
-			var terms []struct {
-				Name string
-				Url  string
-				Time string
-			}
-			for _, article := range Articles {
-				terms = append(terms, struct {
-					Name string
-					Url  string
-					Time string
-				}{
-					Name: article.Title,
-					Url:  fmt.Sprintf("posts/%s", article.DirName),
-					Time: article.CreateDate,
-				})
-			}
-			return terms
-		}(),
 	})
 	if err != nil {
 		http.Error(w, "Failed to execute template", http.StatusInternalServerError)

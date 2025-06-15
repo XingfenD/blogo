@@ -11,7 +11,27 @@ import (
 
 	"github.com/XingfenD/blogo/module/config"
 	"github.com/XingfenD/blogo/module/loader"
+	sqlite_db "github.com/XingfenD/blogo/module/sqlite"
 )
+
+type Terms struct {
+	Name string
+	Url  string
+	Time string
+}
+
+type sectionMeta struct {
+	SectionTitle string
+	SectionName  string
+	SectionCount int
+	SectionTerms []Terms
+}
+
+type ArchiveMeta struct {
+	Categories          []sqlite_db.CollectionListItem
+	Tags                []sqlite_db.CollectionListItem
+	ArticlesOrderByYear map[string][]Terms
+}
 
 var loadedConfig config.Config
 var iconMap map[string]string
@@ -94,6 +114,7 @@ func loadRoot() {
 		if r.URL.Path == "/" {
 			http.Redirect(w, r, "/homepage/", http.StatusFound)
 		} else {
+			loader.Logger.Warnf("RootRouter: Invalid path %s", r.URL.Path)
 			http.Redirect(w, r, "/404", http.StatusFound)
 		}
 	})

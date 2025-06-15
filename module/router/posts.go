@@ -22,6 +22,7 @@ func loadPosts() {
 			path.Clean("/posts/"),
 		)
 		if suffix == "" {
+			loader.Logger.Infof("Request for /posts/ from %s", r.RemoteAddr)
 			postHandler(w, r)
 			return
 		}
@@ -36,35 +37,21 @@ func loadPosts() {
 }
 
 func postHandler(w http.ResponseWriter, r *http.Request) {
-	loader.Logger.Infof("Request for /posts/ from %s", r.RemoteAddr)
 	posts := sqlite_db.GetArticleList()
 
 	err := tpl.SectionTpl.Execute(w, struct {
 		Config      config.Config
 		Icons       map[string]string
-		SectionMeta struct {
-			SectionTitle string
-			SectionName  string
-			SectionCount int
-		}
-		Terms []struct {
-			Name string
-			Url  string
-			Time string
-		}
+		SectionMeta sectionMeta
 	}{
 		Config: loadedConfig,
 		Icons:  iconMap,
-		SectionMeta: struct {
-			SectionTitle string
-			SectionName  string
-			SectionCount int
-		}{
+		SectionMeta: sectionMeta{
 			SectionTitle: "POSTS",
 			SectionName:  "posts",
 			SectionCount: len(posts),
+			SectionTerms: createPostTerms(posts),
 		},
-		Terms: createPostTerms(posts),
 	})
 	if err != nil {
 		http.Error(w, "Failed to execute template", http.StatusInternalServerError)
@@ -108,22 +95,10 @@ func postDetailHandler(dirName string, w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func createPostTerms(posts []sqlite_db.ArticleListItem) []struct {
-	Name string
-	Url  string
-	Time string
-} {
-	var terms []struct {
-		Name string
-		Url  string
-		Time string
-	}
+func createPostTerms(posts []sqlite_db.ArticleListItem) []Terms {
+	var terms []Terms
 	for _, article := range posts {
-		terms = append(terms, struct {
-			Name string
-			Url  string
-			Time string
-		}{
+		terms = append(terms, Terms{
 			Name: article.Title,
 			Url:  fmt.Sprintf("posts/%s.html", article.DirName),
 			Time: article.CreateDate,

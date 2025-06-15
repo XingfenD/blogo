@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/sidebar.css">
+    <link rel="stylesheet" href="/static/css/article.css">
+</head>
+<body>
+    {{template "sidebar" .}}
+    <main class="main full-width">
+        <header>
+        <h2 class="section-list">{{.ColleTableMeta.Title}}</h2>
+        </header>
+        <section class="control-list">
+            <table class="collection-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>名称</th>
+                        <th>文章数量</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .ColleTableMeta.CollectionList}}
+                    <tr>
+                        <td>{{.ColleId}}</td>
+                        <td>{{.ColleName}}</td>
+                        <td>{{.PostCount}}</td>
+                        <td class="actions">
+                            <button class="icon-btn" title="编辑">{{index $.Icons "edit"}}</button>
+                            <button class="icon-btn" title="删除">{{index $.Icons "delete"}}</button>
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </section>
+        {{template "footer" .}}
+    </main>
+</body>
+</html>

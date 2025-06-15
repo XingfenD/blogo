@@ -13,9 +13,9 @@
             <h2 class="section-list">类别 - CATEGORIES</h2>
             <div class="subsection-list">
                 <div class="collection-list--tile">
-                    {{range .Categories}}
-                        <a href="{{$.Config.Basic.BaseUrl}}/archives/categories/{{.Id}}">
-                            <h2 class="collection-list--tile--title">{{.Name}}</h2>
+                    {{range .ArchiveMeta.Categories}}
+                        <a href="{{$.Config.Basic.BaseUrl}}/archives/categories/{{.ColleId}}">
+                            <h2 class="collection-list--tile--title">{{.ColleName}}</h2>
                         </a>
                     {{end}}
                 </div>
@@ -24,9 +24,9 @@
             <h2 class="section-list">标签 - TAGS</h2>
             <div class="subsection-list">
                 <div class="collection-list--tile">
-                    {{range .Tags}}
-                        <a href="{{$.Config.Basic.BaseUrl}}/archives/tags/{{.Id}}">
-                            <h2 class="collection-list--tile--title">{{.Name}}</h2>
+                    {{range .ArchiveMeta.Tags}}
+                        <a href="{{$.Config.Basic.BaseUrl}}/archives/tags/{{.ColleId}}">
+                            <h2 class="collection-list--tile--title">{{.ColleName}}</h2>
                         </a>
                     {{end}}
                 </div>
@@ -35,15 +35,15 @@
             {{if .Config.Archive.ShowTimeline}}
             <h2 class="section-list">时间线 - TIMELINE</h2>
             <div class="subsection-list">
-                {{$years := .ArticlesOrderByYear}}
+                {{$years := .ArchiveMeta.ArticlesOrderByYear}}
                 {{range $year := sortByYearDesc (keys $years)}}
                 <div class="year-group">
                     <h3>{{$year}}</h3>
                     <div class="article-list">
                         {{range getMapValue $years $year}}
                         <article class="article-list--tile">
-                        <a href="{{$.Config.Basic.BaseUrl}}/posts/{{.DirName}}">
-                            <h2 class="article-list--tile--title">{{.Title}}</h2>
+                        <a href="{{$.Config.Basic.BaseUrl}}/{{.Url}}">
+                            <h2 class="article-list--tile--title">{{.Name}}</h2>
                             <time>{{.Time}}</time>
                         </a>
                         </article>
