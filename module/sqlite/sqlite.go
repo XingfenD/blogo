@@ -134,8 +134,12 @@ type ArticleListItem struct {
 	LastModified string
 	Year         string
 	Tags         []string
-	Description  string
-	Content      string
+	Category     struct {
+		Name string
+		Id   int
+	}
+	Description string
+	Content     string
 }
 
 func GetAboutMeta() (*ArticleMeta, error) {
@@ -541,17 +545,7 @@ func GetArticleList() []ArticleListItem {
 	defer rows.Close()
 
 	for rows.Next() {
-		var article struct {
-			BlogId       int
-			DirName      string
-			Title        string
-			CreateDate   string
-			LastModified string
-			Year         string
-			Tags         []string
-			Description  string
-			Content      string
-		}
+		var article ArticleListItem
 
 		err := rows.Scan(
 			&article.Title,
@@ -593,6 +587,54 @@ func GetArticleList() []ArticleListItem {
 
 	if err = rows.Err(); err != nil {
 		loader.Logger.Error("Error after scanning articles:", err)
+	}
+
+	return articles
+}
+
+// 在现有SQLite函数附近添加
+func GetRecentArticles(limit int) []ArticleListItem {
+	var articles []ArticleListItem
+
+	rows, err := db.Query(`
+        SELECT 
+            b.title, 
+            b.dir_name, 
+            b.create_time, 
+            b.last_modified,
+            c.cate_name
+        FROM blog_posts b
+        LEFT JOIN categories c ON b.cate_id = c.cate_id
+        ORDER BY b.last_modified DESC 
+        LIMIT ?`, limit)
+	if err != nil {
+		loader.Logger.Error("Error querying recent articles:", err)
+		return articles
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var article ArticleListItem
+		var category sql.NullString
+
+		err := rows.Scan(
+			&article.Title,
+			&article.DirName,
+			&article.CreateDate,
+			&article.LastModified,
+			&category,
+		)
+
+		if err == nil {
+			if category.Valid {
+				article.Category.Name = category.String
+			}
+			articles = append(articles, article)
+		}
+	}
+
+	if err = rows.Err(); err != nil {
+		loader.Logger.Error("Error after scanning recent articles:", err)
 	}
 
 	return articles

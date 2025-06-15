@@ -22,21 +22,21 @@ func loadTags() {
 		)
 		if suffix == "" {
 			loader.Logger.Infof("Request for /archives/tags/ from %s", r.RemoteAddr)
-			tagHandler(w, r)
+			tagHandler(w)
 			return
 		}
 
 		loader.Logger.Infof("Tag path: %s (From %s)", suffix, r.RemoteAddr)
 		parts := strings.Split(suffix, "/")
 		if len(parts) > 1 {
-			tagDetailHandler(parts[1], w, r)
+			tagDetailHandler(parts[1], w)
 			return
 		}
 
 	})
 }
 
-func tagHandler(w http.ResponseWriter, r *http.Request) {
+func tagHandler(w http.ResponseWriter) {
 	err := tpl.SectionTpl.Execute(w, struct {
 		Config      config.Config
 		Icons       map[string]string
@@ -91,7 +91,7 @@ func tagHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func tagDetailHandler(tagID string, w http.ResponseWriter, r *http.Request) {
+func tagDetailHandler(tagID string, w http.ResponseWriter) {
 	loader.Logger.Infof("Requested tag ID: %s", tagID)
 	tagIDInt, err := strconv.Atoi(tagID)
 	if err != nil {

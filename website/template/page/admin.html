@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/header.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="stylesheet" href="/static/css/sidebar.css">
+    <link rel="stylesheet" href="/static/css/article.css">
+</head>
+<body>
+    {{template "sidebar" .}}
+    <main class="main full-width">
+        <header>
+        <h2 class="section-list">管理员面板</h2>
+        </header>
+        {{template "dashboard" .}}
+        {{template "footer" .}}
+    </main>
+</body>
+</html>

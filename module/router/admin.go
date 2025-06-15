@@ -6,9 +6,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/XingfenD/blogo/module/config"
 	"github.com/XingfenD/blogo/module/loader"
+	sqlite_db "github.com/XingfenD/blogo/module/sqlite"
+	"github.com/XingfenD/blogo/module/tpl"
 	"github.com/golang-jwt/jwt/v5"
-	"golang.org/x/crypto/bcrypt"
 )
 
 // 新增 JWT 配置（需要先在 config 模块添加 JWTSecret 字段）
@@ -29,11 +31,15 @@ func loadAdmin() {
 		if !authMiddleware(w, r) {
 			return
 		}
+
+		if adminPath == "" {
+			handleAdminRender(w, r)
+		} else {
+
+		}
 	})
 }
 
-// 新增认证中间件
-// 修改认证中间件
 func authMiddleware(w http.ResponseWriter, r *http.Request) bool {
 	authHeader := r.Header.Get("Authorization")
 
@@ -64,7 +70,6 @@ func authMiddleware(w http.ResponseWriter, r *http.Request) bool {
 		}
 	}
 
-	// 原有 JWT 验证逻辑
 	if !strings.HasPrefix(authHeader, "Bearer ") {
 		w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
 		http.Error(w, "Authorization required", http.StatusUnauthorized)
@@ -84,7 +89,6 @@ func authMiddleware(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-// 修改登录处理函数
 func handleAdminLogin(w http.ResponseWriter, r *http.Request) {
 	// 添加 Basic 认证支持
 	if authHeader := r.Header.Get("Authorization"); strings.HasPrefix(authHeader, "Basic ") {
@@ -97,6 +101,7 @@ func handleAdminLogin(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		loader.Logger.Warn("Admin login method not allowed from:", r.RemoteAddr)
 		return
 	}
 
@@ -128,9 +133,39 @@ func handleAdminLogin(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`{"token":"` + tokenString + `"}`))
 }
 
-// 新增密码验证函数（需要实现密码哈希方法）
-func checkPasswordHash(password, hash string) bool {
-	// 这里需要实现具体的哈希验证逻辑，例如使用 bcrypt
-	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) == nil
-	// return true
+func handleAdminRender(w http.ResponseWriter, r *http.Request) {
+	stats := struct {
+		TotalPosts      int
+		TotalCategories int
+		TotalTags       int
+	}{
+		TotalPosts:      len(sqlite_db.GetArticleList()),
+		TotalCategories: len(sqlite_db.GetCategoryList()),
+		TotalTags:       len(sqlite_db.GetTagList()),
+	}
+
+	recentPosts := sqlite_db.GetRecentArticles(5) // 需要实现该函数
+
+	err := tpl.AdminTpl.Execute(w, struct {
+		Config        config.Config
+		Icons         map[string]string
+		DashBoardMeta struct {
+			Stats       interface{}
+			RecentPosts []sqlite_db.ArticleListItem
+		}
+	}{
+		Config: loadedConfig,
+		Icons:  iconMap,
+		DashBoardMeta: struct {
+			Stats       interface{}
+			RecentPosts []sqlite_db.ArticleListItem
+		}{
+			Stats:       stats,
+			RecentPosts: recentPosts,
+		},
+	})
+	if err != nil {
+		http.Error(w, "Failed to execute admin template", http.StatusInternalServerError)
+		loader.Logger.Error("Admin template execution failed:", err)
+	}
 }

@@ -15,6 +15,7 @@ var PostTpl *template.Template
 var SectionTpl *template.Template
 var ArchiveTpl *template.Template
 var NotFoundTpl *template.Template
+var AdminTpl *template.Template
 
 var rootPath string
 
@@ -75,6 +76,7 @@ func LoadTemplate(root_path string) {
 	loadPostTpl()
 	loadSectionTpl()
 	loadArchiveTpl()
+	loadAdminTpl()
 	load404Tpl()
 
 	loader.Logger.Info("load template success")
@@ -154,5 +156,21 @@ func load404Tpl() {
 		loader.Logger.Error("load 404 template failed", err)
 	} else {
 		loader.Logger.Info("load 404 template success")
+	}
+}
+
+func loadAdminTpl() {
+	var err error
+	AdminTpl = template.New("admin.html").Funcs(funcMap)
+	AdminTpl, err = AdminTpl.ParseFiles(
+		rootPath+"/template/page/admin.html",
+		rootPath+"/template/layout/dashboard.html",
+		rootPath+"/template/layout/footer.html",
+		rootPath+"/template/layout/sidebar.html",
+	)
+	if err != nil || AdminTpl == nil {
+		loader.Logger.Error("load admin template failed", err)
+	} else {
+		loader.Logger.Info("load admin template success")
 	}
 }
