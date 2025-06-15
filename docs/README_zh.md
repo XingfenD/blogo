@@ -80,6 +80,8 @@ blogo/
 
 本项目采用 [Mozilla Public License 2.0](https://opensource.org/licenses/MPL-2.0) 开源协议。
 
+本项目中使用了字节跳动图标库提供的部分图标。
+
 ## 待办事项
 
 - [ ] 实现后台管理页面

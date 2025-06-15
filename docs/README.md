@@ -80,6 +80,8 @@ blogo/
 
 Licensed under the [Mozilla Public License 2.0](https://opensource.org/licenses/MPL-2.0)
 
+This project utilizes some icons from the ByteDance Icon Library.
+
 ## Todo
 
 - [ ] Implement admin page

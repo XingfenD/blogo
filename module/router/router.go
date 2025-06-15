@@ -58,6 +58,7 @@ func loadRouter() {
 	loadAbout()
 	loadPosts()
 	loadNotFound()
+	loadAdmin()
 	loadRoot()
 
 }

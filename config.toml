@@ -1,3 +1,8 @@
+[security]
+jwt_secret = '123456'
+admin_user = 'admin'
+admin_pass = '123456'
+
 [basic]
 port2listen = 8080
 base_url = 'http://localhost:8080'
@@ -18,10 +23,11 @@ emoji = '😉'
 home_icon = 'home'
 enable_divider = true
 enable_social_links = true
+enable_admin = false
 [[sidebar.social_links]]
 name = 'GitHub'
 url = 'https://github.com/XingfenD'
-icon = 'github'
+icon = 'brand-github'
 [[sidebar.social_links]]
 name = 'Bilibili'
 url = 'https://space.bilibili.com/473214036'

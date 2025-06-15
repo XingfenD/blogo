@@ -46,6 +46,12 @@
                 {{index .Icons "user"}}
                 <span>关于</span>
             </a>
+            {{if .Config.Sidebar.EnableAdmin}}
+            <a href="{{.Config.Basic.BaseUrl}}/admin/">
+                {{index .Icons "create"}}
+                <span>管理</span>
+            </a>
+            {{end}}
         </li>
     </ol>
 

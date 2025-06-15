@@ -7,6 +7,11 @@ import (
 )
 
 type Config struct {
+	Security struct {
+		JWTSecret string `toml:"jwt_secret"`
+		AdminUser string `toml:"admin_user"`
+		AdminPass string `toml:"admin_pass"`
+	}
 	Basic struct {
 		BaseUrl     string `toml:"base_url"`
 		LogLevel    int    `toml:"log_level"`
@@ -24,8 +29,9 @@ type Config struct {
 	Sidebar struct {
 		Emoji             string `toml:"emoji"`
 		EnableDivider     bool   `toml:"enable_divider"`
-		HomeIcon          string `toml:"home_icon"`
 		EnableSocialLinks bool   `toml:"enable_social_links"`
+		EnableAdmin       bool   `toml:"enable_admin"`
+		HomeIcon          string `toml:"home_icon"`
 		SocialLinks       []struct {
 			Name string `toml:"name"`
 			Url  string `toml:"url"`
