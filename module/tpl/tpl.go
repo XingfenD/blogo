@@ -17,6 +17,7 @@ var ArchiveTpl *template.Template
 var NotFoundTpl *template.Template
 var AdminTpl *template.Template
 var ColleTpl *template.Template
+var PostTableTpl *template.Template
 
 var rootPath string
 
@@ -79,6 +80,8 @@ func LoadTemplate(root_path string) {
 	loadArchiveTpl()
 	loadAdminTpl()
 	load404Tpl()
+	loadColleTpl()
+	loadPostTableTpl()
 
 	loader.Logger.Info("load templates success")
 }

@@ -34,8 +34,10 @@ func loadAdmin() {
 
 		if adminPath == "" {
 			handleAdminRender(w, r)
+		} else if adminPath != "posts" {
+			handleCollePage(adminPath, w, r)
 		} else {
-
+			handlePostCollePage(w, r)
 		}
 	})
 }
@@ -170,7 +172,7 @@ func handleAdminRender(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func handleCollePage(w http.ResponseWriter, r *http.Request) {
+func handleCollePage(collectionName string, w http.ResponseWriter, r *http.Request) {
 	err := tpl.ColleTpl.Execute(w, struct {
 		Config         config.Config
 		Icons          map[string]string
@@ -181,9 +183,40 @@ func handleCollePage(w http.ResponseWriter, r *http.Request) {
 	}{
 		Config: loadedConfig,
 		Icons:  iconMap,
+		ColleTableMeta: struct {
+			Title          string
+			CollectionList []sqlite_db.CollectionListItem
+		}{
+			Title: collectionName,
+			CollectionList: func() []sqlite_db.CollectionListItem {
+				if collectionName == "categories" {
+					return sqlite_db.GetCategoryList(true)
+				} else if collectionName == "tags" {
+					return sqlite_db.GetTagList(true)
+				} else {
+					return nil
+				}
+			}(),
+		},
 	})
 	if err != nil {
 		http.Error(w, "Failed to execute collection template", http.StatusInternalServerError)
 		loader.Logger.Error("Collection template execution failed:", err)
+	}
+}
+
+func handlePostCollePage(w http.ResponseWriter, r *http.Request) {
+	err := tpl.PostTableTpl.Execute(w, struct {
+		Config           config.Config
+		Icons            map[string]string
+		ArticleTableMeta []sqlite_db.ArticleListItem
+	}{
+		Config:           loadedConfig,
+		Icons:            iconMap,
+		ArticleTableMeta: sqlite_db.GetArticleList(),
+	})
+	if err != nil {
+		http.Error(w, "Failed to execute post collection template", http.StatusInternalServerError)
+		loader.Logger.Error("Post collection template execution failed:", err)
 	}
 }

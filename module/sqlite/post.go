@@ -278,7 +278,6 @@ func GetArticlesByTag(tagId int) []ArticleListItem {
 func GetArticleList() []ArticleListItem {
 	var articles []ArticleListItem
 
-	// 修改查询语句添加年份字段和排序规则
 	rows, err := db.Query(`
         SELECT
             b.title,
@@ -288,9 +287,11 @@ func GetArticleList() []ArticleListItem {
             b.last_modified,
             b.blog_id,
             b.dir_name,
-            strftime('%Y', create_time) AS year
+            strftime('%Y', create_time) AS year,
+            b.cate_id,
+            c.cate_name
         FROM blog_posts b
-        ORDER BY year DESC, b.create_time DESC`) // 按年份降序+时间降序
+        LEFT JOIN categories c ON b.cate_id = c.cate_id`)
 	if err != nil {
 		loader.Logger.Error("Error querying articles:", err)
 		return articles
@@ -299,6 +300,8 @@ func GetArticleList() []ArticleListItem {
 
 	for rows.Next() {
 		var article ArticleListItem
+		var cateID sql.NullInt64        // 处理可能为NULL的分类ID
+		var categoryName sql.NullString // 新增空值处理变量
 
 		err := rows.Scan(
 			&article.Title,
@@ -308,15 +311,24 @@ func GetArticleList() []ArticleListItem {
 			&article.LastModified,
 			&article.BlogId,
 			&article.DirName,
-			&article.Year, // 扫描新增的年份字段
+			&article.Year,
+			&cateID,
+			&categoryName,
 		)
+
+		if cateID.Valid {
+			article.Category.Id = int(cateID.Int64)
+			article.Category.Name = categoryName.String
+		} else {
+			article.Category.Id = 0
+			article.Category.Name = ""
+		}
 
 		if err != nil {
 			loader.Logger.Error("Error scanning article row:", err)
 			continue
 		}
 
-		// 查询标签信息（与 GetArticlesByCategory 相同逻辑）
 		tagRows, err := db.Query(`
             SELECT t.name
             FROM tags t

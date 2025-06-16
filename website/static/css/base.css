@@ -10,3 +10,12 @@ body {
 .main {
     padding: 20px;
 }
+
+.main header .section-list {
+    color: #2d3748;
+    font-size: 1.5rem;
+    margin: 2rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #cbd5e0;
+    text-transform: uppercase;
+}
